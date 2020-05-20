@@ -37,10 +37,13 @@ namespace ConsoleAppFTPTest
         /// </summary>
         public static string sFromFileName { get { return _sFromFileName; } set { _sFromFileName = value; } }
         /// <summary>
-        /// 下載路徑
+        /// 下載路徑/上傳檔名
         /// </summary>
         public static string sToFileName { get { return _sToFileName; } set { _sToFileName = value; } }
         public static string sFileName { get { return _sFileName; } set { _sFileName = value; } }
+        /// <summary>
+        /// tryCatch
+        /// </summary>
         public static int iFTPReTry { get { return _iFTPReTry; } set { _iFTPReTry = value; } }
 
 
