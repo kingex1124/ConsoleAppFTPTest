@@ -178,6 +178,24 @@ namespace ConsoleAppSFTPTest
         }
         #endregion
 
+        #region 取得SFTP檔案大小資訊
+
+        /// <summary>
+        /// 取得SFTP檔案大小資訊
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public long GetSFTPFileSize(string path)
+        {
+            Connect();
+            var dateSize = sftp.Get(path).Attributes.Size;
+            Disconnect();
+
+            return dateSize;
+        }
+
+        #endregion
+
         #region 移動SFTP檔案
         /// <summary>
         /// 移動SFTP檔案
