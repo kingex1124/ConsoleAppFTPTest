@@ -4,3 +4,7 @@
 
 /.vs/ConsoleAppFTPTest/v16
 /ConsoleAppFTPTest/obj/Debug
+/ConsoleAppFTPTest/bin/Debug
+/ConsoleAppSFTPTest/bin/Debug
+/ConsoleAppSFTPTest/obj/Debug
+/packages/SSH.NET.2016.1.0

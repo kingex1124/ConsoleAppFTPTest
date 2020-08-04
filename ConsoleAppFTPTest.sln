@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppFTPTest", "ConsoleAppFTPTest\ConsoleAppFTPTest.csproj", "{05EB57C0-C9B9-4E86-B86B-9A4C335FED37}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppSFTPTest", "ConsoleAppSFTPTest\ConsoleAppSFTPTest.csproj", "{B86E5103-9062-4AC8-96D5-76DC60D149DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{05EB57C0-C9B9-4E86-B86B-9A4C335FED37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05EB57C0-C9B9-4E86-B86B-9A4C335FED37}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05EB57C0-C9B9-4E86-B86B-9A4C335FED37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B86E5103-9062-4AC8-96D5-76DC60D149DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B86E5103-9062-4AC8-96D5-76DC60D149DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B86E5103-9062-4AC8-96D5-76DC60D149DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B86E5103-9062-4AC8-96D5-76DC60D149DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
