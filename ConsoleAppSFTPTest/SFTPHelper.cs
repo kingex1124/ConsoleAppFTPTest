@@ -30,9 +30,9 @@ namespace ConsoleAppSFTPTest
         /// <param name="port">埠</param>
         /// <param name="user">使用者名稱</param>
         /// <param name="pwd">密碼</param>
-        public SFTPHelper(string ip, string port, string user, string pwd)
+        public SFTPHelper(string ip, int port, string user, string pwd)
         {
-            sftp = new SftpClient(ip, Int32.Parse(port), user, pwd);
+            sftp = new SftpClient(ip, port, user, pwd);
         }
         #endregion
 
@@ -46,9 +46,8 @@ namespace ConsoleAppSFTPTest
             try
             {
                 if (!Connected)
-                {
                     sftp.Connect();
-                }
+
                 return true;
             }
             catch (Exception ex)
@@ -68,9 +67,7 @@ namespace ConsoleAppSFTPTest
             try
             {
                 if (sftp != null && Connected)
-                {
                     sftp.Disconnect();
-                }
             }
             catch (Exception ex)
             {
@@ -169,9 +166,7 @@ namespace ConsoleAppSFTPTest
                 {
                     string name = file.Name;
                     if (name.Length > (fileSuffix.Length + 1) && fileSuffix == name.Substring(name.Length - fileSuffix.Length))
-                    {
                         objList.Add(name);
-                    }
                 }
                 return objList;
             }
