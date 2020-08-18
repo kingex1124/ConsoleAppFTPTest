@@ -244,7 +244,7 @@ namespace ConsoleAppFTPTest
                 // 通訊埠接聽並等待連接
                 ftp.UsePassive = false;
                 // 下傳檔案
-                ftp.Method = System.Net.WebRequestMethods.Ftp.DownloadFile;
+                ftp.Method = WebRequestMethods.Ftp.DownloadFile;
 
                 // 取得FTP請求回應
                 FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
@@ -363,7 +363,7 @@ namespace ConsoleAppFTPTest
                 ftp.Method = WebRequestMethods.Ftp.MakeDirectory;
                
                 // 創建目錄
-                FtpWebResponse ftpWebResponse = (System.Net.FtpWebResponse)ftp.GetResponse();
+                FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
 
                 ftpWebResponse.Close();
 
@@ -400,7 +400,7 @@ namespace ConsoleAppFTPTest
                 ftp.Method = WebRequestMethods.Ftp.DeleteFile;
 
                 // 刪除檔案
-                FtpWebResponse ftpWebResponse = (System.Net.FtpWebResponse)ftp.GetResponse();
+                FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
 
                 ftpWebResponse.Close();
 
