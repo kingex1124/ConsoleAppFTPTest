@@ -114,13 +114,9 @@ namespace ConsoleAppFTPTest
 
                 _ftpReTry--;
                 if (_ftpReTry >= 0)
-                {
                     return GetFileModifiedDate(ftpFolderPath, fileName);
-                }
                 else
-                {
                     return DateTime.MinValue;
-                }
             }
         }
 
@@ -308,8 +304,7 @@ namespace ConsoleAppFTPTest
                         {
                             if (!CheckDownloadData(ftpFolderPath, fileName, localFilePath, fileName))
                                 return false;
-                        }
-                        
+                        }  
                     };
                 }
 
@@ -317,8 +312,11 @@ namespace ConsoleAppFTPTest
             }
             catch (Exception ex)
             {
-
-                return false;
+                _ftpReTry--;
+                if (_ftpReTry >= 0)
+                    return DownloadFolder(ftpFolderPath, localFilePath);
+                else
+                    return false;
             }
         }
 
