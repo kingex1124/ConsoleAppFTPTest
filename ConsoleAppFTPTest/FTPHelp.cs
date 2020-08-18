@@ -48,7 +48,7 @@ namespace ConsoleAppFTPTest
         }
 
         /// <summary>
-        /// 取得檔案列表
+        /// 取得檔案列表(Service完整路徑，但沒有FTP://跟IP那些)
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
@@ -283,6 +283,65 @@ namespace ConsoleAppFTPTest
                 else
                     return false;
             }
+        }
+
+        /// <summary>
+        /// 下載整個folder的檔案(不包含資料夾)
+        /// </summary>
+        /// <param name="ftpFolderPath"></param>
+        /// <param name="localFilePath"></param>
+        /// <returns></returns>
+        public bool DownloadFolder(string ftpFolderPath, string localFilePath)
+        {
+            try
+            {
+                var dataList = GetFileList(ftpFolderPath);
+
+                foreach (var item in dataList)
+                {
+                    if (Path.HasExtension(item))
+                    {
+                        string fileName = Path.GetFileName(item);
+                        if (!DownloadFile(ftpFolderPath, Path.GetFileName(item), localFilePath, fileName))
+                            return false;
+                        else
+                        {
+                            if (!CheckDownloadData(ftpFolderPath, fileName, localFilePath, fileName))
+                                return false;
+                        }
+                        
+                    };
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 比對Service跟地端資料大小是否一致
+        /// </summary>
+        /// <param name="ftpFolderPath"></param>
+        /// <param name="fileName"></param>
+        /// <param name="localFilePath"></param>
+        /// <param name="localFileName"></param>
+        /// <returns></returns>
+        public bool CheckDownloadData(string ftpFolderPath, string fileName, string localFilePath, string localFileName)
+        {
+            long ftpSize = GetFileSize(ftpFolderPath, fileName);
+
+            string localPath = Path.Combine(localFilePath, localFileName);
+
+            long localSize = new FileInfo(localPath).Length;
+
+            if (ftpSize == localSize)
+                return true;
+            else
+                return false;
         }
 
         /// <summary>
