@@ -24,16 +24,28 @@ namespace ConsoleAppSFTPTest
 
         #region 構造
         /// <summary>
-        /// 構造
+        /// 建構子
         /// </summary>
         /// <param name="ip">IP</param>
         /// <param name="port">埠</param>
-        /// <param name="user">使用者名稱</param>
+        /// <param name="user">帳號</param>
         /// <param name="pwd">密碼</param>
         public SFTPHelper(string ip, int port, string user, string pwd)
         {
             sftp = new SftpClient(ip, port, user, pwd);
         }
+
+        /// <summary>
+        /// 建構子
+        /// </summary>
+        /// <param name="ip">IP</param>
+        /// <param name="user">帳號</param>
+        /// <param name="pwd">密碼</param>
+        public SFTPHelper(string ip, string user, string pwd)
+        {
+            sftp = new SftpClient(ip, user, pwd);
+        }
+
         #endregion
 
         #region 連線SFTP
