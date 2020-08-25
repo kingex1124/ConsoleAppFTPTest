@@ -394,7 +394,7 @@ namespace ConsoleAppFtpClientTest
         /// <returns></returns>
         public bool IsFileExists(string ftpFolderPath, string fileName)
         {
-            return _ftp.FileExists(Path.Combine(ftpFolderPath, fileName));
+            return _ftp.FileExists(string.Format("/{0}/{1}", ftpFolderPath, fileName));
         }
 
         /// <summary>
@@ -405,7 +405,7 @@ namespace ConsoleAppFtpClientTest
         /// <returns></returns>
         public bool IsFolderExists(string ftpFolderPath, string folderName)
         {
-            return _ftp.DirectoryExists(Path.Combine(ftpFolderPath, folderName));
+            return _ftp.DirectoryExists(string.Format("/{0}/{1}",ftpFolderPath, folderName));
         }
     }
 }

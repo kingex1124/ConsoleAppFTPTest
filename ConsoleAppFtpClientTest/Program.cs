@@ -31,6 +31,10 @@ namespace ConsoleAppFtpClientTest
 
             // var reRemoveFolder = ftp.RemoveFolder("", "TEST2");
 
+            var reFolderExist = ftp.IsFolderExists("TEST", "123");
+
+            var reDpwFolder = ftp.DownloadFolder("TEST", @"C:\Users\011714\Desktop\down");
+
         }
     }
 }
