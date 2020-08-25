@@ -8,3 +8,6 @@
 /ConsoleAppSFTPTest/bin/Debug
 /ConsoleAppSFTPTest/obj/Debug
 /packages/SSH.NET.2016.1.0
+/ConsoleAppFtpClientTest/bin/Debug
+/ConsoleAppFtpClientTest/obj/Debug
+/packages/System.Net.FtpClient.1.0.5824.34026

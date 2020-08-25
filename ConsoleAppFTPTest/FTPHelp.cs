@@ -10,6 +10,8 @@ namespace ConsoleAppFTPTest
 {
     public class FTPHelp
     {
+        #region 屬性
+
         private string _ftpServerIP;
 
         private string _userName;
@@ -17,6 +19,10 @@ namespace ConsoleAppFTPTest
         private string _passwoed;
 
         private int _ftpReTry = 0;
+
+        #endregion
+
+        #region 建構子
 
         public FTPHelp(FTPParameter param)
         {
@@ -46,6 +52,10 @@ namespace ConsoleAppFTPTest
 
             _ftpReTry = ftpReTry;
         }
+
+        #endregion
+
+        #region 取得表單
 
         /// <summary>
         /// 取得檔案列表(Service完整路徑，但沒有FTP://跟IP那些)
@@ -87,11 +97,15 @@ namespace ConsoleAppFTPTest
             }
         }
 
+        #endregion
+
+        #region 取得修改日期
+
         /// <summary>
         /// 取得檔案最後修改日期
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
-        /// <param name="fileName"></param>
+        /// <param name="fileName">檔案完整名稱(含副檔名)</param>
         /// <returns></returns>
         public DateTime GetFileModifiedDate(string ftpFolderPath,string fileName)
         {
@@ -120,11 +134,15 @@ namespace ConsoleAppFTPTest
             }
         }
 
+        #endregion
+
+        #region 取得檔案大小
+
         /// <summary>
         /// 取得檔案大小
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
-        /// <param name="fileName"></param>
+        /// <param name="fileName">檔案完整名稱(含副檔名)</param>
         /// <returns></returns>
         public long GetFileSize(string ftpFolderPath, string fileName)
         {
@@ -151,6 +169,10 @@ namespace ConsoleAppFTPTest
                     return 0;
             }
         }
+
+        #endregion
+
+        #region 上傳檔案
 
         /// <summary>
         /// 上傳檔案
@@ -218,6 +240,10 @@ namespace ConsoleAppFTPTest
             }
         }
 
+        #endregion
+
+        #region 下載檔案
+
         /// <summary>
         /// 下載檔案
         /// </summary>
@@ -281,6 +307,10 @@ namespace ConsoleAppFTPTest
             }
         }
 
+        #endregion
+
+        #region 下載整個資料夾
+
         /// <summary>
         /// 下載整個folder的檔案(不包含資料夾)
         /// </summary>
@@ -320,6 +350,10 @@ namespace ConsoleAppFTPTest
             }
         }
 
+        #endregion
+
+        #region 比較伺服端跟地端檔案大小是否一致
+
         /// <summary>
         /// 比對Service跟地端資料大小是否一致
         /// </summary>
@@ -330,17 +364,32 @@ namespace ConsoleAppFTPTest
         /// <returns></returns>
         public bool CheckDownloadData(string ftpFolderPath, string fileName, string localFilePath, string localFileName)
         {
-            long ftpSize = GetFileSize(ftpFolderPath, fileName);
+            try
+            {
+                long ftpSize = GetFileSize(ftpFolderPath, fileName);
 
-            string localPath = Path.Combine(localFilePath, localFileName);
+                string localPath = Path.Combine(localFilePath, localFileName);
 
-            long localSize = new FileInfo(localPath).Length;
+                long localSize = new FileInfo(localPath).Length;
 
-            if (ftpSize == localSize)
-                return true;
-            else
-                return false;
+                if (ftpSize == localSize)
+                    return true;
+                else
+                    return false;
+            }
+            catch (Exception ex)
+            {
+                _ftpReTry--;
+                if (_ftpReTry >= 0)
+                    return CheckDownloadData(ftpFolderPath, fileName, localFilePath, localFileName);
+                else
+                    return false;
+            }
         }
+
+        #endregion
+
+        #region 在FTP上建立資料夾
 
         /// <summary>
         /// 在FTP上建立資料夾
@@ -377,6 +426,10 @@ namespace ConsoleAppFTPTest
             }
         }
 
+        #endregion
+
+        #region 刪除檔案
+
         /// <summary>
         /// 刪除檔案(資料夾不行)
         /// </summary>
@@ -390,7 +443,7 @@ namespace ConsoleAppFTPTest
                 string uriPath = string.Format("{0}{1}/{2}/{3}", "FTP://", _ftpServerIP, ftpFolderPath, fileName);
 
                 FtpWebRequest ftp = SettingFTP(uriPath);
-
+                
                 // 設定連線模式及相關參數
                 // 關閉/保持 連線
                 ftp.KeepAlive = false;
@@ -413,6 +466,10 @@ namespace ConsoleAppFTPTest
                     return false;
             }
         }
+
+        #endregion
+
+        #region 刪除資料夾
 
         /// <summary>
         /// 刪除資料夾(不可以刪除檔案)
@@ -449,7 +506,9 @@ namespace ConsoleAppFTPTest
             }
         }
 
+        #endregion
 
+        #region 設定FTP參數
 
         /// <summary>
         /// 設定連線模式及相關參數
@@ -469,6 +528,8 @@ namespace ConsoleAppFTPTest
 
             return ftp;
         }
+
+        #endregion
 
     }
 }

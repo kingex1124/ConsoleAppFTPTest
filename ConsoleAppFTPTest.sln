@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppFTPTest", "Consol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppSFTPTest", "ConsoleAppSFTPTest\ConsoleAppSFTPTest.csproj", "{B86E5103-9062-4AC8-96D5-76DC60D149DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppFtpClientTest", "ConsoleAppFtpClientTest\ConsoleAppFtpClientTest.csproj", "{AF4946D0-A710-4D8E-9B3D-F038EE8F8D1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B86E5103-9062-4AC8-96D5-76DC60D149DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B86E5103-9062-4AC8-96D5-76DC60D149DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B86E5103-9062-4AC8-96D5-76DC60D149DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF4946D0-A710-4D8E-9B3D-F038EE8F8D1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF4946D0-A710-4D8E-9B3D-F038EE8F8D1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF4946D0-A710-4D8E-9B3D-F038EE8F8D1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF4946D0-A710-4D8E-9B3D-F038EE8F8D1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

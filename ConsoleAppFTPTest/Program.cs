@@ -14,7 +14,7 @@ namespace ConsoleAppFTPTest
             string path = Path.Combine("FTP://", "123");
 
             //var data = new FileInfo(@"C:\Users\011714\Desktop\down\TEST2.txt").Length;
-       
+
             FTPParameter param = new FTPParameter("128.110.5.134", "006788", "ftp006788");
 
             FTPHelp ftp = new FTPHelp(param);
