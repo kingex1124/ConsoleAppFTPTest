@@ -112,6 +112,8 @@ namespace ConsoleAppFtpClientTest
 
         #endregion
 
+        #region 取得表單
+
         /// <summary>
         /// 取得檔案列表(Service完整路徑)
         /// </summary>
@@ -132,10 +134,13 @@ namespace ConsoleAppFtpClientTest
             }
             catch (Exception ex)
             {
-
                 throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
+
+        #endregion
+
+        #region 取得修改日期
 
         /// <summary>
         /// 取得檔案最後修改日期
@@ -158,6 +163,10 @@ namespace ConsoleAppFtpClientTest
             }
         }
 
+        #endregion
+
+        #region 取得檔案大小
+
         /// <summary>
         /// 取得檔案大小
         /// </summary>
@@ -178,6 +187,10 @@ namespace ConsoleAppFtpClientTest
                 throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
+
+        #endregion
+
+        #region 上傳檔案
 
         /// <summary>
         /// 上傳檔案
@@ -208,6 +221,10 @@ namespace ConsoleAppFtpClientTest
                 throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
+
+        #endregion
+
+        #region 下載檔案
 
         /// <summary>
         /// 下載檔案
@@ -247,6 +264,10 @@ namespace ConsoleAppFtpClientTest
             }
         }
 
+        #endregion
+
+        #region 下載整個資料夾
+
         /// <summary>
         /// 下載整個folder的檔案(不包含資料夾)
         /// </summary>
@@ -282,6 +303,10 @@ namespace ConsoleAppFtpClientTest
             }
         }
 
+        #endregion
+
+        #region 比較Service跟地端資料大小是否一致
+
         /// <summary>
         /// 比對Service跟地端資料大小是否一致
         /// </summary>
@@ -309,8 +334,11 @@ namespace ConsoleAppFtpClientTest
             {
                 throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
-
         }
+
+        #endregion
+
+        #region 在FTP上建立資料夾
 
         /// <summary>
         /// 在FTP上建立資料夾
@@ -334,8 +362,11 @@ namespace ConsoleAppFtpClientTest
             {
                 throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
-           
         }
+
+        #endregion
+
+        #region 刪除檔案
 
         /// <summary>
         /// 刪除檔案(資料夾不行)
@@ -361,6 +392,10 @@ namespace ConsoleAppFtpClientTest
             }
         }
 
+        #endregion
+
+        #region 刪除資料夾
+
         /// <summary>
         /// 刪除資料夾(不可以刪除檔案)
         /// </summary>
@@ -374,7 +409,7 @@ namespace ConsoleAppFtpClientTest
                 if (IsFolderExists(ftpFolderPath, folderName))
                 {
                     _ftp.DeleteDirectory(Path.Combine(ftpFolderPath, folderName));
-
+                    
                     return true;
                 }
                 else
@@ -385,6 +420,10 @@ namespace ConsoleAppFtpClientTest
                 throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
+
+        #endregion
+
+        #region 判斷檔案是否存在FTP上
 
         /// <summary>
         /// 判斷檔案是否存在FTP上
@@ -397,6 +436,10 @@ namespace ConsoleAppFtpClientTest
             return _ftp.FileExists(string.Format("/{0}/{1}", ftpFolderPath, fileName));
         }
 
+        #endregion
+
+        #region 判斷資料夾是否存在FTP上
+
         /// <summary>
         /// 判斷資料夾是否存在FTP上
         /// </summary>
@@ -407,5 +450,8 @@ namespace ConsoleAppFtpClientTest
         {
             return _ftp.DirectoryExists(string.Format("/{0}/{1}",ftpFolderPath, folderName));
         }
+
+        #endregion
+
     }
 }
