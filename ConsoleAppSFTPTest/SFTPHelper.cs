@@ -415,7 +415,7 @@ namespace ConsoleAppSFTPTest
         /// <returns></returns>
         public bool IsFileExists(string ftpFolderPath, string fileName)
         {
-            return _sftp.Exists(string.Format("/{0}/{1}", ftpFolderPath, fileName));
+            return _sftp.Exists(string.Format("{0}/{1}", ftpFolderPath, fileName));
         }
 
         #endregion

@@ -14,7 +14,27 @@ namespace ConsoleAppSFTPTest
 
             var reConn = sftpHelp.Connect();
 
-            var reList = sftpHelp.GetFileList("");
+            var reList = sftpHelp.GetFileList("/C:/Users/ssh011684/");
+
+            var reModDateTime = sftpHelp.GetFileModifiedDate("TEST", "TEST1.txt");
+
+            var reSize = sftpHelp.GetFileSize("TEST", "TEST2.txt");
+
+            //var reUpload = sftpHelp.UploadFile("", "123TEST.txt", @"C:\Users\011714\Desktop\down", "TEST2.txt");
+
+            //var reDownload = sftpHelp.DownloadFile("TEST", "TEST2.txt", @"C:\Users\011714\Desktop\down", "newdata.txt");
+
+            //var reDowFolder = sftpHelp.DownloadFolder("TEST", @"C:\Users\011714\Desktop\down");
+
+            //var reCompare = sftpHelp.CheckDownloadData("TEST", "TEST2.txt", @"C:\Users\011714\Desktop\down", "TEST2.txt");
+
+            //var reCreateFolder = sftpHelp.CreateFolder("", "測試");
+
+            //var reDelete = sftpHelp.DeleteFile("", "TEST.txt");
+
+            //var reDeleteFolder = sftpHelp.RemoveFolder("", "測試");
+
+            sftpHelp.Move("123.txt", "TEST/123.txt");
         }
     }
 }
