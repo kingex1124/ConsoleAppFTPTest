@@ -15,11 +15,11 @@ namespace ConsoleAppFtpClientTest
 
             var conres = ftp.Connect();
 
-            var reList = ftp.GetFileList("TEST");
+            //var reList = ftp.GetFileList("TEST");
 
-            DateTime reDateTime = ftp.GetFileModifiedDate("", "chase_upload.txt");
+            //DateTime reDateTime = ftp.GetFileModifiedDate("", "chase_upload.txt");
 
-            var reSize = ftp.GetFileSize("", "chase_upload.txt");
+            //var reSize = ftp.GetFileSize("", "chase_upload.txt");
 
             //var reUpload = ftp.UploadFile("TEST", "123.txt", @"C:\Users\011714\Desktop\down", "TEST.txt");
 
@@ -31,10 +31,11 @@ namespace ConsoleAppFtpClientTest
 
             // var reRemoveFolder = ftp.RemoveFolder("", "TEST2");
 
-            var reFolderExist = ftp.IsFolderExists("TEST", "123");
+            //var reFolderExist = ftp.IsFolderExists("TEST", "123");
 
-            var reDpwFolder = ftp.DownloadFolder("TEST", @"C:\Users\011714\Desktop\down");
+            //var reDpwFolder = ftp.DownloadFolder("TEST", @"C:\Users\011714\Desktop\down");
 
+            var reUpFolder = ftp.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
         }
     }
 }

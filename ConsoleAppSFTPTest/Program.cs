@@ -12,13 +12,13 @@ namespace ConsoleAppSFTPTest
         {
             SFTPHelper sftpHelp = new SFTPHelper("128.110.138.11", 22, "SSH011684", "011684");
 
-            var reConn = sftpHelp.Connect();
+            //var reConn = sftpHelp.Connect();
 
-            var reList = sftpHelp.GetFileList("/C:/Users/ssh011684/");
+            //var reList = sftpHelp.GetFileList("/C:/Users/ssh011684/");
 
-            var reModDateTime = sftpHelp.GetFileModifiedDate("TEST", "TEST1.txt");
+            //var reModDateTime = sftpHelp.GetFileModifiedDate("TEST", "TEST1.txt");
 
-            var reSize = sftpHelp.GetFileSize("TEST", "TEST2.txt");
+            //var reSize = sftpHelp.GetFileSize("TEST", "TEST2.txt");
 
             //var reUpload = sftpHelp.UploadFile("", "123TEST.txt", @"C:\Users\011714\Desktop\down", "TEST2.txt");
 
@@ -34,7 +34,13 @@ namespace ConsoleAppSFTPTest
 
             //var reDeleteFolder = sftpHelp.RemoveFolder("", "測試");
 
-            sftpHelp.Move("123.txt", "TEST/123.txt");
+            //sftpHelp.Move("123.txt", "TEST/123.txt");
+
+            SFTPHelper sftpHelp2 = new SFTPHelper("128.110.5.135", 22, "APUSER", "2wsx#EDC");
+
+            var reConn2 = sftpHelp2.Connect();
+
+            var reUpFolder = sftpHelp2.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
         }
     }
 }

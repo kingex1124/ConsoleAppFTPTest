@@ -19,6 +19,8 @@ namespace ConsoleAppFTPTest
 
             FTPHelp ftp = new FTPHelp(param);
 
+            var reUpFolder = ftp.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
+
             //var da = ftp.GetFileList("TEST");
 
             //bool result = ftp.DownloadFolder("TEST", @"C:\Users\011714\Desktop\down");
@@ -32,10 +34,9 @@ namespace ConsoleAppFTPTest
             FTPHelp ftp2 = new FTPHelp(param2);
 
    
+            //var res = ftp2.UploadFile("", "TEST.txt", @"C:\Users\011714\Desktop\down", "TEST.txt");
 
-            var res = ftp2.UploadFile("", "TEST.txt", @"C:\Users\011714\Desktop\down", "TEST.txt");
-
-            var data = ftp2.GetFileList("");
+            //var data = ftp2.GetFileList("");
         }
       
     }

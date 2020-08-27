@@ -223,6 +223,41 @@ namespace ConsoleAppSFTPTest
 
         #endregion
 
+        #region 上傳整個資料夾
+
+        /// <summary>
+        /// 上傳整個資料夾
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <param name="localFilePath">地端資料夾路徑</param>
+        /// <returns></returns>
+        public bool UploadFolder(string ftpFolderPath, string localFilePath)
+        {
+            try
+            {
+                var dataList = Directory.EnumerateFiles(localFilePath);
+                foreach (var item in dataList)
+                {
+
+                    string fileName = Path.GetFileName(item);
+                    if (!UploadFile(ftpFolderPath, fileName, localFilePath, fileName))
+                        return false;
+                    else
+                    {
+                        if (!CheckDownloadData(ftpFolderPath, fileName, localFilePath, fileName))
+                            return false;
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+            }
+        }
+
+        #endregion
+
         #region 下載檔案
 
         /// <summary>
@@ -277,7 +312,7 @@ namespace ConsoleAppSFTPTest
                     if (Path.HasExtension(item))
                     {
                         string fileName = Path.GetFileName(item);
-                        if (!DownloadFile(ftpFolderPath, Path.GetFileName(item), localFilePath, fileName))
+                        if (!DownloadFile(ftpFolderPath, fileName, localFilePath, fileName))
                             return false;
                         else
                         {
