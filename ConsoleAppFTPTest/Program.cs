@@ -13,31 +13,31 @@ namespace ConsoleAppFTPTest
         {
             string path = Path.Combine("FTP://", "123");
 
+            // 測試取得資料大小
             //var data = new FileInfo(@"C:\Users\011714\Desktop\down\TEST2.txt").Length;
 
             FTPParameter param = new FTPParameter("128.110.5.134", "006788", "ftp006788");
 
             FTPHelp ftp = new FTPHelp(param);
 
-            var reUpFolder = ftp.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
+            //FTPParameter param2 = new FTPParameter("128.110.5.135", "006788", "ftp006788");
 
-            //var da = ftp.GetFileList("TEST");
+            //FTPHelp ftp2 = new FTPHelp(param2);
 
-            //bool result = ftp.DownloadFolder("TEST", @"C:\Users\011714\Desktop\down");
+            //var reUpFolder = ftp.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
 
-            //DateTime re = ftp.GetFileModifiedDate("", "chase_upload.txt");
+            //var reFileList = ftp.GetFileList("TEST");
 
-            // bool re = ftp.DownloadFile("", "TEST", @"C:\Users\011714\Desktop\down", @"C:\Users\011714\Desktop\down");
+            //bool reDowFolder = ftp.DownloadFolder("TEST", @"C:\Users\011714\Desktop\down");
 
-            FTPParameter param2 = new FTPParameter("128.110.5.135", "006788", "ftp006788");
+            //DateTime reDateTime = ftp.GetFileModifiedDate("", "chase_upload.txt");
 
-            FTPHelp ftp2 = new FTPHelp(param2);
+            //bool reDowFile = ftp.DownloadFile("", "TEST", @"C:\Users\011714\Desktop\down", @"C:\Users\011714\Desktop\down");
 
-   
-            //var res = ftp2.UploadFile("", "TEST.txt", @"C:\Users\011714\Desktop\down", "TEST.txt");
+            //var reUpFile = ftp.UploadFile("", "TEST.txt", @"C:\Users\011714\Desktop\down", "TEST.txt");
 
-            //var data = ftp2.GetFileList("");
+            //var reFileList2 = ftp.GetFileList("");
         }
-      
+
     }
 }
