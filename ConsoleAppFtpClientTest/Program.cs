@@ -35,7 +35,9 @@ namespace ConsoleAppFtpClientTest
 
             //var reDpwFolder = ftp.DownloadFolder("TEST", @"C:\Users\011714\Desktop\down");
 
-            var reUpFolder = ftp.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
+            //var reUpFolder = ftp.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
+
+            var reUpFolder = ftp.UploadFolder("測試", @"C:\Users\cam\Desktop\TestData");
         }
     }
 }

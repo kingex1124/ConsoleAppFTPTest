@@ -37,6 +37,8 @@ namespace ConsoleAppFTPTest
             //var reUpFile = ftp.UploadFile("", "TEST.txt", @"C:\Users\011714\Desktop\down", "TEST.txt");
 
             //var reFileList2 = ftp.GetFileList("");
+
+            var reUpFolder = ftp.UploadFolder("測試", @"C:\Users\cam\Desktop\TestData");
         }
 
     }

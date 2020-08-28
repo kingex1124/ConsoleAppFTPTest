@@ -40,7 +40,8 @@ namespace ConsoleAppSFTPTest
 
             var reConn2 = sftpHelp2.Connect();
 
-            var reUpFolder = sftpHelp2.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
+            //var reUpFolder = sftpHelp2.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
+            var reUpFolder = sftpHelp2.UploadFolder("測試", @"C:\Users\cam\Desktop\TestData");
         }
     }
 }
