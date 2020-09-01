@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -62,7 +64,7 @@ namespace ConsoleAppFTPTest
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
-        public List<string> GetFileList(string ftpFolderPath)
+        public List<string> GetFileAndFolderList(string ftpFolderPath)
         {
             try
             {
@@ -91,7 +93,63 @@ namespace ConsoleAppFTPTest
             {
                 _ftpReTry--;
                 if (_ftpReTry >= 0)
+                    return GetFileAndFolderList(ftpFolderPath);
+                else
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// 取得檔案列表
+        /// </summary>
+        /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        public List<string> GetFileList(string ftpFolderPath)
+        {
+            try
+            {
+                var fileAndFolder = GetFileAndFolderList(ftpFolderPath);
+
+                List<string> result = new List<string>();
+                foreach (var item in fileAndFolder)
+                    if (Path.HasExtension(item))
+                        result.Add(item);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _ftpReTry--;
+                if (_ftpReTry >= 0)
                     return GetFileList(ftpFolderPath);
+                else
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// 取得資料夾列表
+        /// </summary>
+        /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        public List<string> GetFolderList(string ftpFolderPath)
+        {
+            try
+            {
+                var fileAndFolder = GetFileAndFolderList(ftpFolderPath);
+
+                List<string> result = new List<string>();
+                foreach (var item in fileAndFolder)
+                    if (!Path.HasExtension(item))
+                        result.Add(item);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _ftpReTry--;
+                if (_ftpReTry >= 0)
+                    return GetFolderList(ftpFolderPath);
                 else
                     return null;
             }
@@ -193,6 +251,11 @@ namespace ConsoleAppFTPTest
                 FtpWebRequest ftp = SettingFTP(uriPath);
 
                 // 設定連線模式及相關參數
+
+                // FTPS用設定
+                //ServicePointManager.ServerCertificateValidationCallback = AcceptAllCertificatePolicy;
+                //ftp.EnableSsl = true;
+
                 // 關閉/保持 連線
                 ftp.KeepAlive = false;
                 // 通訊埠接聽並等待連接
@@ -238,6 +301,12 @@ namespace ConsoleAppFTPTest
                 else
                     return false;
             }
+        }
+
+        //增加這個方法 add this method
+        public bool AcceptAllCertificatePolicy(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
         }
 
         #endregion
@@ -360,7 +429,7 @@ namespace ConsoleAppFTPTest
         {
             try
             {
-                var dataList = GetFileList(ftpFolderPath);
+                var dataList = GetFileAndFolderList(ftpFolderPath);
 
                 foreach (var item in dataList)
                 {
@@ -569,6 +638,5 @@ namespace ConsoleAppFTPTest
         }
 
         #endregion
-
     }
 }

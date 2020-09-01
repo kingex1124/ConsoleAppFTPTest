@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,6 +12,10 @@ namespace ConsoleAppFTPTest
     {
         static void Main(string[] args)
         {
+            //FTPHelp ftp3 = new FTPHelp("128.110.138.11", "test", "011684");
+
+            //var re = ftp3.UploadFile("", "123.txt", @"C:\Users\011714\Desktop\down", "TEST1.txt");
+
             string path = Path.Combine("FTP://", "123");
 
             // 測試取得資料大小
@@ -20,6 +25,9 @@ namespace ConsoleAppFTPTest
 
             FTPHelp ftp = new FTPHelp(param);
 
+            var reFileDataList = ftp.GetFileList("");
+
+            var reFolderList = ftp.GetFolderList("");
             // ftp.RemoveFolder("", "測試");
 
             //FTPParameter param2 = new FTPParameter("128.110.5.135", "006788", "ftp006788");
@@ -28,7 +36,7 @@ namespace ConsoleAppFTPTest
 
             //var reUpFolder = ftp.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
 
-            //var reFileList = ftp.GetFileList("TEST");
+            var reFileList = ftp.GetFileAndFolderList("");
 
             //bool reDowFolder = ftp.DownloadFolder("TEST", @"C:\Users\011714\Desktop\down");
 

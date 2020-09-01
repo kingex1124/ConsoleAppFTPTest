@@ -50,17 +50,14 @@ namespace ConsoleAppFtpClientTest
             _ftp.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
             _ftp.ValidateCertificate += Ftp_ValidateCertificate;
             _ftp.Credentials = new NetworkCredential(user, pwd);
-
         }
 
-
-
-    /// <summary>
-    /// 驗證
-    /// </summary>
-    /// <param name="control"></param>
-    /// <param name="e"></param>
-    private void Ftp_ValidateCertificate(FtpClient control, FtpSslValidationEventArgs e)
+        /// <summary>
+        /// 驗證
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="e"></param>
+        private void Ftp_ValidateCertificate(FtpClient control, FtpSslValidationEventArgs e)
         {
 
             if (e.PolicyErrors != System.Net.Security.SslPolicyErrors.None)
@@ -69,9 +66,7 @@ namespace ConsoleAppFtpClientTest
                 e.Accept = true;
             }
             else
-            {
                 e.Accept = true;
-            }
         }
 
         #endregion
@@ -124,7 +119,7 @@ namespace ConsoleAppFtpClientTest
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
-        public List<string> GetFileList(string ftpFolderPath)
+        public List<string> GetFileAndFolderList(string ftpFolderPath)
         {
             try
             {
@@ -134,6 +129,54 @@ namespace ConsoleAppFtpClientTest
 
                 foreach (var item in dataArr)
                     result.Add(item.FullName);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// 取得檔案列表
+        /// </summary>
+        /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        public List<string> GetFileList(string ftpFolderPath)
+        {
+            try
+            {
+                var fileAndFolder = GetFileAndFolderList(ftpFolderPath);
+
+                List<string> result = new List<string>();
+                foreach (var item in fileAndFolder)
+                    if (Path.HasExtension(item))
+                        result.Add(item);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// 取得資料夾列表
+        /// </summary>
+        /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        public List<string> GetFolderList(string ftpFolderPath)
+        {
+            try
+            {
+                var fileAndFolder = GetFileAndFolderList(ftpFolderPath);
+
+                List<string> result = new List<string>();
+                foreach (var item in fileAndFolder)
+                    if (!Path.HasExtension(item))
+                        result.Add(item);
 
                 return result;
             }
@@ -318,7 +361,7 @@ namespace ConsoleAppFtpClientTest
         {
             try
             {
-                var dataList = GetFileList(ftpFolderPath);
+                var dataList = GetFileAndFolderList(ftpFolderPath);
 
                 foreach (var item in dataList)
                 {
@@ -449,7 +492,7 @@ namespace ConsoleAppFtpClientTest
                 if (IsFolderExists(ftpFolderPath, folderName))
                 {
                     _ftp.DeleteDirectory(Path.Combine(ftpFolderPath, folderName));
-                    
+
                     return true;
                 }
                 else
@@ -488,7 +531,7 @@ namespace ConsoleAppFtpClientTest
         /// <returns></returns>
         public bool IsFolderExists(string ftpFolderPath, string folderName)
         {
-            return _ftp.DirectoryExists(string.Format("/{0}/{1}",ftpFolderPath, folderName));
+            return _ftp.DirectoryExists(string.Format("/{0}/{1}", ftpFolderPath, folderName));
         }
 
         #endregion

@@ -96,7 +96,7 @@ namespace ConsoleAppSFTPTest
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
-        public List<string> GetFileList(string ftpFolderPath)
+        public List<string> GetFileAndFolderList(string ftpFolderPath)
         {
             try
             {
@@ -116,12 +116,60 @@ namespace ConsoleAppSFTPTest
         }
 
         /// <summary>
+        /// 取得檔案列表
+        /// </summary>
+        /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        public List<string> GetFileList(string ftpFolderPath)
+        {
+            try
+            {
+                var fileAndFolder = GetFileAndFolderList(ftpFolderPath);
+
+                List<string> result = new List<string>();
+                foreach (var item in fileAndFolder)
+                    if (Path.HasExtension(item))
+                        result.Add(item);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("SFTP檔案上傳失敗，原因：{0}", ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// 取得資料夾列表
+        /// </summary>
+        /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        public List<string> GetFolderList(string ftpFolderPath)
+        {
+            try
+            {
+                var fileAndFolder = GetFileAndFolderList(ftpFolderPath);
+
+                List<string> result = new List<string>();
+                foreach (var item in fileAndFolder)
+                    if (!Path.HasExtension(item))
+                        result.Add(item);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("SFTP檔案上傳失敗，原因：{0}", ex.Message));
+            }
+        }
+
+        /// <summary>
         /// 獲取SFTP檔案列表
         /// </summary>
         /// <param name="remotePath">遠端目錄</param>
         /// <param name="fileSuffix">檔案字尾</param>
         /// <returns></returns>
-        public List<string> GetFileList(string remotePath, string fileSuffix)
+        public List<string> GetFileAndFolderList(string remotePath, string fileSuffix)
         {
             try
             {
@@ -305,7 +353,7 @@ namespace ConsoleAppSFTPTest
         {
             try
             {
-                var dataList = GetFileList(ftpFolderPath);
+                var dataList = GetFileAndFolderList(ftpFolderPath);
 
                 foreach (var item in dataList)
                 {
