@@ -1,9 +1,9 @@
-﻿using System;
+﻿using FluentFTP;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.FtpClient;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,17 +47,22 @@ namespace ConsoleAppFtpClientTest
             _ftp.Host = ip;
             _ftp.Port = port;
             _ftp.EncryptionMode = FtpEncryptionMode.Implicit;
+            _ftp.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
             _ftp.ValidateCertificate += Ftp_ValidateCertificate;
             _ftp.Credentials = new NetworkCredential(user, pwd);
+
         }
 
-        /// <summary>
-        /// 驗證
-        /// </summary>
-        /// <param name="control"></param>
-        /// <param name="e"></param>
-        private void Ftp_ValidateCertificate(FtpClient control, FtpSslValidationEventArgs e)
+
+
+    /// <summary>
+    /// 驗證
+    /// </summary>
+    /// <param name="control"></param>
+    /// <param name="e"></param>
+    private void Ftp_ValidateCertificate(FtpClient control, FtpSslValidationEventArgs e)
         {
+
             if (e.PolicyErrors != System.Net.Security.SslPolicyErrors.None)
             {
                 // invalid cert, do you want to accept it?
