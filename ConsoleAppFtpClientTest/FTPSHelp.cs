@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleAppFtpClientTest
 {
-    public class FTPHelp
+    public class FTPSHelp
     {
         #region 屬性
 
@@ -27,7 +27,7 @@ namespace ConsoleAppFtpClientTest
         /// <param name="ip">IP</param>
         /// <param name="user">帳號</param>
         /// <param name="pwd">密碼</param>
-        public FTPHelp(string ip, string user, string pwd)
+        public FTPSHelp(string ip, string user, string pwd)
         {
             _ftp = new FtpClient();
             _ftp.Host = ip;
@@ -41,7 +41,7 @@ namespace ConsoleAppFtpClientTest
         /// <param name="port">Port</param>
         /// <param name="user">帳號</param>
         /// <param name="pwd">密碼</param>
-        public FTPHelp(string ip, int port, string user, string pwd)
+        public FTPSHelp(string ip, int port, string user, string pwd)
         {
             _ftp = new FtpClient();
             _ftp.Host = ip;
