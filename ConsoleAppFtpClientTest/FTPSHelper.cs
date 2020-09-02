@@ -157,7 +157,7 @@ namespace ConsoleAppFtpClientTest
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                throw new Exception(string.Format("斷線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -185,7 +185,7 @@ namespace ConsoleAppFtpClientTest
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                throw new Exception(string.Format("取得FTP表單失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -209,7 +209,7 @@ namespace ConsoleAppFtpClientTest
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                throw new Exception(string.Format("取得FTP檔案列表失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -233,7 +233,7 @@ namespace ConsoleAppFtpClientTest
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                throw new Exception(string.Format("取得FTP資料夾列表失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -254,11 +254,11 @@ namespace ConsoleAppFtpClientTest
                 if (IsFileExists(ftpFolderPath, fileName))
                     return _ftp.GetModifiedTime(Path.Combine(ftpFolderPath, fileName));
                 else
-                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
+                    throw new Exception(string.Format("取得FTP檔案修改日其失敗，原因：{0}", "FTP上無此檔案"));
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                throw new Exception(string.Format("取得FTP檔案修改日其失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -279,11 +279,11 @@ namespace ConsoleAppFtpClientTest
                 if (IsFileExists(ftpFolderPath, fileName))
                     return _ftp.GetFileSize(Path.Combine(ftpFolderPath, fileName));
                 else
-                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
+                    throw new Exception(string.Format("取得FTP檔案大小失敗，原因：{0}", "FTP上無此檔案"));
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                throw new Exception(string.Format("取得FTP檔案大小失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -299,8 +299,9 @@ namespace ConsoleAppFtpClientTest
         /// <param name="localFilePath">地端資料夾路徑</param>
         /// <param name="localFileName">地端檔案名稱</param>
         /// <returns></returns>
-        public bool UploadFile(string ftpFolderPath, string fileName, string localFilePath, string localFileName)
+        public ExecuteResult UploadFile(string ftpFolderPath, string fileName, string localFilePath, string localFileName)
         {
+            ExecuteResult result = new ExecuteResult();
             try
             {
                 string ftpPath = Path.Combine(ftpFolderPath, fileName);
@@ -319,15 +320,22 @@ namespace ConsoleAppFtpClientTest
                                 ftpStream.Write(buffer, 0, count);
                         }
                     }
-                    return true;
+
+                    result.IsSuccessed = true;
+                    result.Message = "上傳成功";
                 }
                 else
-                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "地端無此檔案"));
+                {
+                    result.IsSuccessed = false;
+                    result.Message = string.Format("上傳FTP檔案失敗，原因：{0}", "地端無此檔案");
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                result.IsSuccessed = false;
+                result.Message = string.Format("上傳FTP檔案失敗，原因：{0}", ex.Message);
             }
+            return result;
         }
 
         #endregion
@@ -340,29 +348,38 @@ namespace ConsoleAppFtpClientTest
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <param name="localFilePath">地端資料夾路徑</param>
         /// <returns></returns>
-        public bool UploadFolder(string ftpFolderPath, string localFilePath)
+        public ExecuteResult UploadFolder(string ftpFolderPath, string localFilePath)
         {
+            ExecuteResult result = new ExecuteResult();
             try
             {
                 var dataList = Directory.EnumerateFiles(localFilePath);
                 foreach (var item in dataList)
                 {
-
                     string fileName = Path.GetFileName(item);
-                    if (!UploadFile(ftpFolderPath, fileName, localFilePath, fileName))
-                        return false;
+
+                    ExecuteResult uploadResult = UploadFile(ftpFolderPath, fileName, localFilePath, fileName);
+
+                    if (!uploadResult.IsSuccessed)
+                        return uploadResult;
                     else
                     {
-                        if (!CheckDownloadData(ftpFolderPath, fileName, localFilePath, fileName))
-                            return false;
+                        ExecuteResult checkDataConsistentResult = CheckDataConsistent(ftpFolderPath, fileName, localFilePath, fileName);
+
+                        if (!checkDataConsistentResult.IsSuccessed)
+                            return checkDataConsistentResult;
                     }
                 }
-                return true;
+
+                result.IsSuccessed = true;
+                result.Message = "上傳資料夾檔案成功。";
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                result.IsSuccessed = false;
+                result.Message = string.Format("FTP上傳資料夾檔案失敗，原因：{0}", ex.Message);
             }
+            return result;
         }
 
         #endregion
@@ -377,17 +394,15 @@ namespace ConsoleAppFtpClientTest
         /// <param name="localFilePath">地端資料夾路徑</param>
         /// <param name="localFileName">地端檔案名稱(可更改)</param>
         /// <returns></returns>
-        public bool DownloadFile(string ftpFolderPath, string fileName, string localFilePath, string localFileName)
+        public ExecuteResult DownloadFile(string ftpFolderPath, string fileName, string localFilePath, string localFileName)
         {
+            ExecuteResult result = new ExecuteResult();
             try
             {
                 if (IsFileExists(ftpFolderPath, fileName))
                 {
                     string ftpPath = Path.Combine(ftpFolderPath, fileName);
                     string localPath = Path.Combine(localFilePath, localFileName);
-
-                    if (!IsFileExists(ftpFolderPath, fileName))
-                        throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
 
                     using (Stream ftpStream = _ftp.OpenRead(ftpPath))
                     {
@@ -399,15 +414,21 @@ namespace ConsoleAppFtpClientTest
                                 fileStream.Write(buffer, 0, count);
                         }
                     }
-                    return true;
+                    result.IsSuccessed = true;
+                    result.Message = "檔案下載成功。";
                 }
                 else
-                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
+                {
+                    result.IsSuccessed = false;
+                    result.Message = string.Format("下載FTP檔案失敗，原因：{0}", "FTP上無此檔案");
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                result.IsSuccessed = false;
+                result.Message = string.Format("下載FTP檔案失敗，原因：{0}", ex.Message);
             }
+            return result;
         }
 
         #endregion
@@ -420,8 +441,9 @@ namespace ConsoleAppFtpClientTest
         /// <param name="ftpFolderPath"></param>
         /// <param name="localFilePath"></param>
         /// <returns></returns>
-        public bool DownloadFolder(string ftpFolderPath, string localFilePath)
+        public ExecuteResult DownloadFolder(string ftpFolderPath, string localFilePath)
         {
+            ExecuteResult result = new ExecuteResult();
             try
             {
                 var dataList = GetFileList(ftpFolderPath);
@@ -429,21 +451,29 @@ namespace ConsoleAppFtpClientTest
                 foreach (var item in dataList)
                 {
                     string fileName = Path.GetFileName(item);
-                    if (!DownloadFile(ftpFolderPath, fileName, localFilePath, fileName))
-                        return false;
+
+                    ExecuteResult downloadResult = DownloadFile(ftpFolderPath, fileName, localFilePath, fileName);
+
+                    if (!downloadResult.IsSuccessed)
+                        return downloadResult;
                     else
                     {
-                        if (!CheckDownloadData(ftpFolderPath, fileName, localFilePath, fileName))
-                            return false;
+                        ExecuteResult checkDataConsistentResult = CheckDataConsistent(ftpFolderPath, fileName, localFilePath, fileName);
+
+                        if (!checkDataConsistentResult.IsSuccessed)
+                            return checkDataConsistentResult;
                     }
                 }
 
-                return true;
+                result.IsSuccessed = true;
+                result.Message = "下載資料夾檔案成功。";
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                result.IsSuccessed = false;
+                result.Message = string.Format("下載FTP資料夾檔案失敗，原因：{0}", ex.Message);
             }
+            return result;
         }
 
         #endregion
@@ -458,8 +488,9 @@ namespace ConsoleAppFtpClientTest
         /// <param name="localFilePath"></param>
         /// <param name="localFileName"></param>
         /// <returns></returns>
-        public bool CheckDownloadData(string ftpFolderPath, string fileName, string localFilePath, string localFileName)
+        public ExecuteResult CheckDataConsistent(string ftpFolderPath, string fileName, string localFilePath, string localFileName)
         {
+            ExecuteResult result = new ExecuteResult();
             try
             {
                 long ftpSize = GetFileSize(ftpFolderPath, fileName);
@@ -471,17 +502,28 @@ namespace ConsoleAppFtpClientTest
                     long localSize = new FileInfo(localPath).Length;
 
                     if (ftpSize == localSize)
-                        return true;
+                    {
+                        result.IsSuccessed = true;
+                        result.Message = "FTP上與地端檔案一致。";
+                    }
                     else
-                        return false;
+                    {
+                        result.IsSuccessed = false;
+                        result.Message = "地端檔案與上傳檔案大小不一致。";
+                    }
                 }
                 else
-                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "地端無此檔案"));
+                {
+                    result.IsSuccessed = false;
+                    result.Message = string.Format("FTP檔案與地端檔案比較失敗，原因：{0}", "地端無此檔案");
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                result.IsSuccessed = false;
+                result.Message = string.Format("FTP檔案與地端檔案比較失敗，原因：{0}", ex.Message);
             }
+            return result;
         }
 
         #endregion
@@ -494,22 +536,30 @@ namespace ConsoleAppFtpClientTest
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <param name="folderName">資料夾名稱</param>
         /// <returns></returns>
-        public bool CreateFolder(string ftpFolderPath, string folderName)
+        public ExecuteResult CreateFolder(string ftpFolderPath, string folderName)
         {
+            ExecuteResult result = new ExecuteResult();
             try
             {
                 if (!IsFolderExists(ftpFolderPath, folderName))
                 {
                     _ftp.CreateDirectory(Path.Combine(ftpFolderPath, folderName));
-                    return true;
+
+                    result.IsSuccessed = true;
+                    result.Message = "資料夾建立成功。";
                 }
                 else
-                    return true;
+                {
+                    result.IsSuccessed = false;
+                    result.Message = string.Format("FTP建立資料夾失敗，原因：{0}", "FTP上資料夾已存在");
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                result.IsSuccessed = false;
+                result.Message = string.Format("FTP建立資料夾失敗，原因：{0}", ex.Message);
             }
+            return result;
         }
 
         #endregion
@@ -522,22 +572,30 @@ namespace ConsoleAppFtpClientTest
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <param name="fileName">檔案名稱</param>
         /// <returns></returns>
-        public bool DeleteFile(string ftpFolderPath, string fileName)
+        public ExecuteResult DeleteFile(string ftpFolderPath, string fileName)
         {
+            ExecuteResult result = new ExecuteResult();
             try
             {
                 if (IsFileExists(ftpFolderPath, fileName))
                 {
                     _ftp.DeleteFile(Path.Combine(ftpFolderPath, fileName));
-                    return true;
+
+                    result.IsSuccessed = true;
+                    result.Message = "刪除檔案成功。";
                 }
                 else
-                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
+                {
+                    result.IsSuccessed = false;
+                    result.Message = string.Format("FTP刪除檔案失敗，原因：{0}", "FTP上無此檔案");
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                result.IsSuccessed = false;
+                result.Message = string.Format("FTP刪除檔案失敗，原因：{0}", ex.Message);
             }
+            return result;
         }
 
         #endregion
@@ -550,23 +608,30 @@ namespace ConsoleAppFtpClientTest
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <param name="folderName">資料夾名稱</param>
         /// <returns></returns>
-        public bool RemoveFolder(string ftpFolderPath, string folderName)
+        public ExecuteResult RemoveFolder(string ftpFolderPath, string folderName)
         {
+            ExecuteResult result = new ExecuteResult();
             try
             {
                 if (IsFolderExists(ftpFolderPath, folderName))
                 {
                     _ftp.DeleteDirectory(Path.Combine(ftpFolderPath, folderName));
 
-                    return true;
+                    result.IsSuccessed = true;
+                    result.Message = "成功刪除資料夾";
                 }
                 else
-                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此資料夾"));
+                {
+                    result.IsSuccessed = false;
+                    result.Message = string.Format("FTP刪除資料夾失敗，原因：{0}", "FTP上無此資料夾");
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+                result.IsSuccessed = false;
+                result.Message = string.Format("FTP刪除資料夾失敗，原因：{0}", ex.Message);
             }
+            return result;
         }
 
         #endregion
@@ -600,6 +665,5 @@ namespace ConsoleAppFtpClientTest
         }
 
         #endregion
-
     }
 }
