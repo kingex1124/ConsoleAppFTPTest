@@ -424,21 +424,18 @@ namespace ConsoleAppFtpClientTest
         {
             try
             {
-                var dataList = GetFileAndFolderList(ftpFolderPath);
+                var dataList = GetFileList(ftpFolderPath);
 
                 foreach (var item in dataList)
                 {
-                    if (Path.HasExtension(item))
+                    string fileName = Path.GetFileName(item);
+                    if (!DownloadFile(ftpFolderPath, fileName, localFilePath, fileName))
+                        return false;
+                    else
                     {
-                        string fileName = Path.GetFileName(item);
-                        if (!DownloadFile(ftpFolderPath, fileName, localFilePath, fileName))
+                        if (!CheckDownloadData(ftpFolderPath, fileName, localFilePath, fileName))
                             return false;
-                        else
-                        {
-                            if (!CheckDownloadData(ftpFolderPath, fileName, localFilePath, fileName))
-                                return false;
-                        }
-                    };
+                    }
                 }
 
                 return true;
