@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,6 +24,7 @@ namespace ConsoleAppSFTPTest
         #endregion
 
         #region 構造
+
         /// <summary>
         /// 建構子
         /// </summary>
@@ -32,6 +34,9 @@ namespace ConsoleAppSFTPTest
         /// <param name="pwd">密碼</param>
         public SFTPHelper(string ip, int port, string user, string pwd)
         {
+            if (!PingIPByPowerShell(ip, port))
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));
+
             _sftp = new SftpClient(ip, port, user, pwd);
         }
 
@@ -43,7 +48,54 @@ namespace ConsoleAppSFTPTest
         /// <param name="pwd">密碼</param>
         public SFTPHelper(string ip, string user, string pwd)
         {
+            if (!PingIPByPowerShell(ip))
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));
+
             _sftp = new SftpClient(ip, user, pwd);
+        }
+
+        #endregion
+
+        #region 判斷FTP站台是否存在
+
+        /// <summary>
+        /// 判斷FTP站台是否存在
+        /// </summary>
+        /// <param name="ftpServerIP"></param>
+        /// <returns></returns>
+        private bool PingIPByPowerShell(string ftpServerIP, int port = -1)
+        {
+            string powStr = string.Empty;
+
+            try
+            {
+                using (PowerShell powershell = PowerShell.Create())
+                {
+                    string result = string.Empty;
+
+                    // 沒port 走一般FTP 21 port
+                    if (port == -1)
+                        powStr = string.Format("Test-NetConnection -ComputerName {0} -Port 21", ftpServerIP);
+                    else
+                        powStr = string.Format("Test-NetConnection -ComputerName {0} -Port {1}", ftpServerIP, port);
+
+                    powershell.AddScript(powStr);
+
+                    var powerResult = powershell.Invoke();
+
+                    foreach (PSObject resultItem in powerResult)
+                        result = resultItem.Members["TcpTestSucceeded"].Value.ToString();
+
+                    if (result == "False")
+                        return false;
+                    else
+                        return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+            }
         }
 
         #endregion
@@ -209,7 +261,7 @@ namespace ConsoleAppSFTPTest
                 if (IsFileExists(ftpFolderPath, fileName))
                     return _sftp.GetLastAccessTime(Path.Combine(ftpFolderPath, fileName));
                 else
-                    return DateTime.MinValue;
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
             }
             catch (Exception ex)
             {
@@ -234,7 +286,7 @@ namespace ConsoleAppSFTPTest
                 if (IsFileExists(ftpFolderPath, fileName))
                     return _sftp.Get(Path.Combine(ftpFolderPath, fileName)).Attributes.Size;
                 else
-                    return -1;
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
             }
             catch (Exception ex)
             {
@@ -258,10 +310,19 @@ namespace ConsoleAppSFTPTest
         {
             try
             {
-                using (var fileStream = File.OpenRead(Path.Combine(localFilePath, localFileName)))
-                    _sftp.UploadFile(fileStream, Path.Combine(ftpFolderPath, fileName));
+                string ftpPath = Path.Combine(ftpFolderPath, fileName);
 
-                return true;
+                string localPath = Path.Combine(localFilePath, localFileName);
+
+                if (File.Exists(localPath))
+                {
+                    using (var fileStream = File.OpenRead(localPath))
+                        _sftp.UploadFile(fileStream, ftpPath);
+
+                    return true;
+                }
+                else
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "地端無此檔案"));
             }
             catch (Exception ex)
             {
@@ -325,13 +386,16 @@ namespace ConsoleAppSFTPTest
                     string serverPath = Path.Combine(ftpFolderPath, fileName);
                     string localPath = Path.Combine(localFilePath, localFileName);
 
+                    if (!IsFileExists(ftpFolderPath, fileName))
+                        throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
+
                     var byt = _sftp.ReadAllBytes(serverPath);
                     File.WriteAllBytes(localPath, byt);
 
                     return true;
                 }
                 else
-                    return false;
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
             }
             catch (Exception ex)
             {
@@ -398,12 +462,17 @@ namespace ConsoleAppSFTPTest
 
                 string localPath = Path.Combine(localFilePath, localFileName);
 
-                long localSize = new FileInfo(localPath).Length;
+                if (File.Exists(localPath))
+                {
+                    long localSize = new FileInfo(localPath).Length;
 
-                if (ftpSize == localSize)
-                    return true;
+                    if (ftpSize == localSize)
+                        return true;
+                    else
+                        return false;
+                }
                 else
-                    return false;
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "地端無此檔案"));
             }
             catch (Exception ex)
             {
@@ -454,7 +523,7 @@ namespace ConsoleAppSFTPTest
                     return true;
                 }
                 else
-                    return false;
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
             }
             catch (Exception ex)
             {
@@ -476,9 +545,14 @@ namespace ConsoleAppSFTPTest
         {
             try
             {
-                _sftp.DeleteDirectory(Path.Combine(ftpFolderPath, folderName));
-          
-                return true;
+                if (IsFolderExists(ftpFolderPath, folderName))
+                {
+                    _sftp.DeleteDirectory(Path.Combine(ftpFolderPath, folderName));
+
+                    return true;
+                }
+                else
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此資料夾"));
             }
             catch (Exception ex)
             {
@@ -503,6 +577,29 @@ namespace ConsoleAppSFTPTest
 
         #endregion
 
+        #region 判斷資料夾是否存在FTP上
+
+        /// <summary>
+        /// 判斷資料夾是否存在FTP上
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <param name="folderName">資料夾名稱</param>
+        /// <returns></returns>
+        public bool IsFolderExists(string ftpFolderPath, string folderName)
+        {
+            string ftpPath = string.Format("{0}/{1}", ftpFolderPath, folderName);
+
+            List<string> ftpFolderList = GetFolderList(ftpFolderPath);
+
+            foreach (var item in ftpFolderList)
+                if (Path.GetFileNameWithoutExtension(item) == folderName)
+                    return true;
+
+            return false;
+        }
+
+        #endregion
+
         #region 移動SFTP檔案
         /// <summary>
         /// 移動SFTP檔案
@@ -513,9 +610,7 @@ namespace ConsoleAppSFTPTest
         {
             try
             {
-                Connect();
                 _sftp.RenameFile(oldRemotePath, newRemotePath);
-                Disconnect();
             }
             catch (Exception ex)
             {

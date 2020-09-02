@@ -32,8 +32,8 @@ namespace ConsoleAppFTPTest
         /// </summary>
         public string Password { get; set; }
         /// <summary>
-        /// 失敗時重連的次數
+        /// 設定是否走加密的FTP
         /// </summary>
-        public int FTPReTry { get; set; }
+        public FTPMode FTPMode { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Management.Automation;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,18 @@ namespace ConsoleAppFTPTest
     {
         static void Main(string[] args)
         {
+            //using (PowerShell powershell = PowerShell.Create())
+            //{
+            //    powershell.AddScript("Test-NetConnection -ComputerName 128.110.5.135 -Port 21");
+
+            //    var powerResult = powershell.Invoke();
+
+            //    foreach (PSObject result in powerResult)
+            //    {
+            //        Console.WriteLine(result.Members["TcpTestSucceeded"].Value);
+            //    }
+            //}
+
             //FTPHelp ftp3 = new FTPHelp("128.110.138.11", "test", "011684");
 
             //var re = ftp3.UploadFile("", "123.txt", @"C:\Users\011714\Desktop\down", "TEST1.txt");

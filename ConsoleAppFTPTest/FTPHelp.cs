@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Management.Automation;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -20,7 +21,7 @@ namespace ConsoleAppFTPTest
 
         private string _passwoed;
 
-        private int _ftpReTry = 0;
+        private FTPMode _ftpMode;
 
         #endregion
 
@@ -34,7 +35,7 @@ namespace ConsoleAppFTPTest
 
             _passwoed = param.Password;
 
-            _ftpReTry = param.FTPReTry;
+            _ftpMode = param.FTPMode;
         }
 
         /// <summary>
@@ -43,8 +44,8 @@ namespace ConsoleAppFTPTest
         /// <param name="ftpServerIP">FTPService IP</param>
         /// <param name="userName">帳號</param>
         /// <param name="password">密碼</param>
-        /// <param name="ftpReTry">重試次數</param>
-        public FTPHelp(string ftpServerIP, string userName, string password, int ftpReTry = 0)
+        /// <param name="ftpMode">設定是否走加密的FTP</param>
+        public FTPHelp(string ftpServerIP, string userName, string password, FTPMode ftpMode = FTPMode.None)
         {
             _ftpServerIP = ftpServerIP;
 
@@ -52,7 +53,50 @@ namespace ConsoleAppFTPTest
 
             _passwoed = password;
 
-            _ftpReTry = ftpReTry;
+            _ftpMode = ftpMode;
+
+            if (!PingIPByPowerShell(ftpServerIP))
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));
+        }
+
+        #endregion
+
+        #region 判斷FTP站台是否存在
+
+        /// <summary>
+        /// 判斷FTP站台是否存在
+        /// </summary>
+        /// <param name="ftpServerIP"></param>
+        /// <returns></returns>
+        private bool PingIPByPowerShell(string ftpServerIP)
+        {
+            string powStr = string.Empty;
+
+            try
+            {
+                using (PowerShell powershell = PowerShell.Create())
+                {
+                    string result = string.Empty;
+
+                    powStr = string.Format("Test-NetConnection -ComputerName {0} -Port 21", ftpServerIP);
+
+                    powershell.AddScript(powStr);
+
+                    var powerResult = powershell.Invoke();
+
+                    foreach (PSObject resultItem in powerResult)
+                        result = resultItem.Members["TcpTestSucceeded"].Value.ToString();
+
+                    if (result == "False")
+                        return false;
+                    else
+                        return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
+            }
         }
 
         #endregion
@@ -79,7 +123,7 @@ namespace ConsoleAppFTPTest
                 ftp.Method = WebRequestMethods.Ftp.ListDirectory;
 
                 //取得FTP請求回應
-                StreamReader streamReader = new StreamReader(ftp.GetResponse().GetResponseStream(), Encoding.Default);
+                StreamReader streamReader = new StreamReader(ftp.GetResponse().GetResponseStream(), Encoding.UTF8);
 
                 while (!(streamReader.EndOfStream))
                     result.Add(streamReader.ReadLine());
@@ -91,11 +135,7 @@ namespace ConsoleAppFTPTest
             }
             catch (Exception ex)
             {
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return GetFileAndFolderList(ftpFolderPath);
-                else
-                    return null;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -119,11 +159,7 @@ namespace ConsoleAppFTPTest
             }
             catch (Exception ex)
             {
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return GetFileList(ftpFolderPath);
-                else
-                    return null;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -147,11 +183,7 @@ namespace ConsoleAppFTPTest
             }
             catch (Exception ex)
             {
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return GetFolderList(ftpFolderPath);
-                else
-                    return null;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -169,26 +201,26 @@ namespace ConsoleAppFTPTest
         {
             try
             {
-                string uriPath = string.Format("{0}{1}/{2}/{3}", "FTP://", _ftpServerIP, ftpFolderPath, fileName);
+                if (IsFileExists(ftpFolderPath, fileName))
+                {
+                    string uriPath = string.Format("{0}{1}/{2}/{3}", "FTP://", _ftpServerIP, ftpFolderPath, fileName);
 
-                FtpWebRequest ftp = SettingFTP(uriPath);
+                    FtpWebRequest ftp = SettingFTP(uriPath);
 
-                //取得資料修改日期
-                ftp.Method = WebRequestMethods.Ftp.GetDateTimestamp;
+                    //取得資料修改日期
+                    ftp.Method = WebRequestMethods.Ftp.GetDateTimestamp;
 
-                //取得FTP請求回應
-                FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
+                    //取得FTP請求回應
+                    FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
 
-                return ftpWebResponse.LastModified;
+                    return ftpWebResponse.LastModified;
+                }
+                else
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
             }
             catch (Exception ex)
             {
-
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return GetFileModifiedDate(ftpFolderPath, fileName);
-                else
-                    return DateTime.MinValue;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -206,25 +238,26 @@ namespace ConsoleAppFTPTest
         {
             try
             {
-                string uriPath = string.Format("{0}{1}/{2}/{3}", "FTP://", _ftpServerIP, ftpFolderPath, fileName);
+                if (IsFileExists(ftpFolderPath, fileName))
+                {
+                    string uriPath = string.Format("{0}{1}/{2}/{3}", "FTP://", _ftpServerIP, ftpFolderPath, fileName);
 
-                FtpWebRequest ftp = SettingFTP(uriPath);
+                    FtpWebRequest ftp = SettingFTP(uriPath);
 
-                // 設定連線模式及相關參數
-                // 取得資料容量大小
-                ftp.Method = WebRequestMethods.Ftp.GetFileSize;
+                    // 設定連線模式及相關參數
+                    // 取得資料容量大小
+                    ftp.Method = WebRequestMethods.Ftp.GetFileSize;
 
-                // 取得FTP請求回應
-                FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
-                return ftpWebResponse.ContentLength;
+                    // 取得FTP請求回應
+                    FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
+                    return ftpWebResponse.ContentLength;
+                }
+                else
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
             }
             catch (Exception ex)
             {
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return GetFileSize(ftpFolderPath, fileName);
-                else
-                    return 0;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -248,58 +281,61 @@ namespace ConsoleAppFTPTest
 
                 string localPath = Path.Combine(localFilePath, localFileName);
 
-                FtpWebRequest ftp = SettingFTP(uriPath);
-
-                // 設定連線模式及相關參數
-
-                // FTPS用設定
-                //ServicePointManager.ServerCertificateValidationCallback = AcceptAllCertificatePolicy;
-                //ftp.EnableSsl = true;
-
-                // 關閉/保持 連線
-                ftp.KeepAlive = false;
-                // 通訊埠接聽並等待連接
-                ftp.UsePassive = false;
-                //下傳檔案
-                ftp.Method = WebRequestMethods.Ftp.UploadFile;
-                /* proxy setting (不使用proxy) */
-                ftp.Proxy = GlobalProxySelection.GetEmptyWebProxy();
-                ftp.Proxy = null;
-
-                // 上傳檔案 檔案設為讀取模式
-                FileStream fileStream = new FileStream(localPath, FileMode.Open, FileAccess.Read); 
-                // 資料串流設為上傳至FTP
-                Stream stream = ftp.GetRequestStream();
-
-                //傳輸位元初始化
-                byte[] byteBuffer = new byte[2047]; 
-                int iRead = 0;
-
-                do
+                if(File.Exists(localPath))
                 {
-                    // 讀取上傳檔案
-                    iRead = fileStream.Read(byteBuffer, 0, byteBuffer.Length); 
-                    // 傳送資料串流
-                    stream.Write(byteBuffer, 0, iRead); 
-                } while (!(iRead == 0));
+                    FtpWebRequest ftp = SettingFTP(uriPath);
 
-                fileStream.Flush();
-                fileStream.Close();
-                fileStream.Dispose();
-                stream.Flush();
-                stream.Close();
-                stream.Dispose();
+                    // 設定連線模式及相關參數
 
-                return true;
+                    // FTPS用設定
+                    if (_ftpMode == FTPMode.Explicit)
+                    {
+                        ServicePointManager.ServerCertificateValidationCallback = AcceptAllCertificatePolicy;
+                        ftp.EnableSsl = true;
+                    }
 
+                    // 關閉/保持 連線
+                    ftp.KeepAlive = false;
+                    // 通訊埠接聽並等待連接
+                    ftp.UsePassive = false;
+                    //下傳檔案
+                    ftp.Method = WebRequestMethods.Ftp.UploadFile;
+                    /* proxy setting (不使用proxy) */
+                    ftp.Proxy = GlobalProxySelection.GetEmptyWebProxy();
+                    ftp.Proxy = null;
+
+                    // 上傳檔案 檔案設為讀取模式
+                    FileStream fileStream = new FileStream(localPath, FileMode.Open, FileAccess.Read);
+                    // 資料串流設為上傳至FTP
+                    Stream stream = ftp.GetRequestStream();
+
+                    //傳輸位元初始化
+                    byte[] byteBuffer = new byte[2047];
+                    int iRead = 0;
+
+                    do
+                    {
+                        // 讀取上傳檔案
+                        iRead = fileStream.Read(byteBuffer, 0, byteBuffer.Length);
+                        // 傳送資料串流
+                        stream.Write(byteBuffer, 0, iRead);
+                    } while (!(iRead == 0));
+
+                    fileStream.Flush();
+                    fileStream.Close();
+                    fileStream.Dispose();
+                    stream.Flush();
+                    stream.Close();
+                    stream.Dispose();
+
+                    return true;
+                }
+                else
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "地端無此檔案"));
             }
             catch (Exception ex)
             {
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return UploadFile(ftpFolderPath, fileName, localFilePath, localFileName);
-                else
-                    return false;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -340,11 +376,7 @@ namespace ConsoleAppFTPTest
             }
             catch (Exception ex)
             {
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return UploadFolder(ftpFolderPath, localFilePath);
-                else
-                    return false;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -368,50 +400,59 @@ namespace ConsoleAppFTPTest
 
                 string localPath = Path.Combine(localFilePath, localFileName);
 
-                FtpWebRequest ftp = SettingFTP(uriPath);
-
-                // 設定連線模式及相關參數
-                // 通訊埠接聽並等待連接
-                ftp.UsePassive = false;
-                // 下傳檔案
-                ftp.Method = WebRequestMethods.Ftp.DownloadFile;
-
-                // 取得FTP請求回應
-                FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
-
-                // 檔案設為寫入模式
-                FileStream fileStream = new FileStream(localPath, FileMode.Create, FileAccess.Write);
-                // 資料串流設為上傳至FTP
-                Stream stream = ftpWebResponse.GetResponseStream();
-
-                //傳輸位元初始化
-                byte[] byteBuffer = new byte[2047];
-                int iRead = 0;
-
-                do
+                if (IsFileExists(ftpFolderPath, fileName))
                 {
-                    iRead = stream.Read(byteBuffer, 0, byteBuffer.Length); //接收資料串流
-                    fileStream.Write(byteBuffer, 0, iRead); //寫入下載檔案
-                    //Console.WriteLine("bBuffer: {0} Byte", iRead);
-                } while (!(iRead == 0));
+                    FtpWebRequest ftp = SettingFTP(uriPath);
 
-                stream.Flush();
-                stream.Close();
-                stream.Dispose();
-                fileStream.Flush();
-                fileStream.Close();
-                fileStream.Dispose();
-                ftpWebResponse.Close();
+                    // 設定連線模式及相關參數
 
-                return true;
+                    // FTPS用設定
+                    if (_ftpMode == FTPMode.Explicit)
+                    {
+                        ServicePointManager.ServerCertificateValidationCallback = AcceptAllCertificatePolicy;
+                        ftp.EnableSsl = true;
+                    }
+
+                    // 通訊埠接聽並等待連接
+                    ftp.UsePassive = false;
+                    // 下傳檔案
+                    ftp.Method = WebRequestMethods.Ftp.DownloadFile;
+
+                    // 取得FTP請求回應
+                    FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
+
+                    // 檔案設為寫入模式
+                    FileStream fileStream = new FileStream(localPath, FileMode.Create, FileAccess.Write);
+                    // 資料串流設為上傳至FTP
+                    Stream stream = ftpWebResponse.GetResponseStream();
+
+                    //傳輸位元初始化
+                    byte[] byteBuffer = new byte[2047];
+                    int iRead = 0;
+
+                    do
+                    {
+                        iRead = stream.Read(byteBuffer, 0, byteBuffer.Length); //接收資料串流
+                        fileStream.Write(byteBuffer, 0, iRead); //寫入下載檔案
+                                                                //Console.WriteLine("bBuffer: {0} Byte", iRead);
+                    } while (!(iRead == 0));
+
+                    stream.Flush();
+                    stream.Close();
+                    stream.Dispose();
+                    fileStream.Flush();
+                    fileStream.Close();
+                    fileStream.Dispose();
+                    ftpWebResponse.Close();
+
+                    return true;
+                }
+                else
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
             }
             catch (Exception ex)
             {
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return DownloadFile(ftpFolderPath, fileName, localFilePath, localFileName);
-                else
-                    return false;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -450,11 +491,7 @@ namespace ConsoleAppFTPTest
             }
             catch (Exception ex)
             {
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return DownloadFolder(ftpFolderPath, localFilePath);
-                else
-                    return false;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -478,20 +515,21 @@ namespace ConsoleAppFTPTest
 
                 string localPath = Path.Combine(localFilePath, localFileName);
 
-                long localSize = new FileInfo(localPath).Length;
+                if (File.Exists(localPath))
+                {
+                    long localSize = new FileInfo(localPath).Length;
 
-                if (ftpSize == localSize)
-                    return true;
+                    if (ftpSize == localSize)
+                        return true;
+                    else
+                        return false;
+                }
                 else
-                    return false;
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "地端無此檔案"));
             }
             catch (Exception ex)
             {
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return CheckDownloadData(ftpFolderPath, fileName, localFilePath, localFileName);
-                else
-                    return false;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -526,11 +564,7 @@ namespace ConsoleAppFTPTest
             }
             catch (Exception ex)
             {
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return CreateFolder(ftpFolderPath, folderName);
-                else
-                    return false;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -550,28 +584,29 @@ namespace ConsoleAppFTPTest
             {
                 string uriPath = string.Format("{0}{1}/{2}/{3}", "FTP://", _ftpServerIP, ftpFolderPath, fileName);
 
-                FtpWebRequest ftp = SettingFTP(uriPath);
-                
-                // 設定連線模式及相關參數
-                // 關閉/保持 連線
-                ftp.KeepAlive = false;
-                // 刪除檔案
-                ftp.Method = WebRequestMethods.Ftp.DeleteFile;
+                if (IsFileExists(ftpFolderPath, fileName))
+                {
+                    FtpWebRequest ftp = SettingFTP(uriPath);
 
-                // 刪除檔案
-                FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
+                    // 設定連線模式及相關參數
+                    // 關閉/保持 連線
+                    ftp.KeepAlive = false;
+                    // 刪除檔案
+                    ftp.Method = WebRequestMethods.Ftp.DeleteFile;
 
-                ftpWebResponse.Close();
+                    // 刪除檔案
+                    FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
 
-                return true;
+                    ftpWebResponse.Close();
+
+                    return true;
+                }
+                else
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此檔案"));
             }
             catch (Exception ex)
             {
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return DeleteFile(ftpFolderPath, fileName);
-                else
-                    return false;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
         }
 
@@ -591,27 +626,74 @@ namespace ConsoleAppFTPTest
             {
                 string uriPath = string.Format("{0}{1}/{2}/{3}", "FTP://", _ftpServerIP, ftpFolderPath, folderName);
 
-                FtpWebRequest ftp = SettingFTP(uriPath);
-                // 關閉/保持 連線
-                ftp.KeepAlive = false;
-                // 移除資料夾
-                ftp.Method = WebRequestMethods.Ftp.RemoveDirectory;
+                if(IsFolderExists(ftpFolderPath, folderName))
+                {
+                    FtpWebRequest ftp = SettingFTP(uriPath);
+                    // 關閉/保持 連線
+                    ftp.KeepAlive = false;
+                    // 移除資料夾
+                    ftp.Method = WebRequestMethods.Ftp.RemoveDirectory;
 
-                // 刪除資料夾
-                FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
+                    // 刪除資料夾
+                    FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
 
-                ftpWebResponse.Close();
+                    ftpWebResponse.Close();
 
-                return true;
+                    return true;
+                }
+                else
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "FTP上無此資料夾"));
             }
             catch (Exception ex)
             {
-                _ftpReTry--;
-                if (_ftpReTry >= 0)
-                    return RemoveFolder(ftpFolderPath, folderName);
-                else
-                    return false;
+                throw new Exception(string.Format("連線FTP失敗，原因：{0}", ex.Message));
             }
+        }
+
+        #endregion
+
+        #region 判斷檔案是否存在FTP上
+
+        /// <summary>
+        /// 判斷檔案是否存在FTP上
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <param name="fileName">檔案名稱</param>
+        /// <returns></returns>
+        public bool IsFileExists(string ftpFolderPath, string fileName)
+        {
+            string ftpPath = string.Format("{0}/{1}", ftpFolderPath, fileName);
+
+            List<string> ftpFileList = GetFileList(ftpFolderPath);
+
+            foreach (var item in ftpFileList)
+                if (Path.GetFileName(item) == fileName)
+                    return true;
+
+            return false;
+        }
+
+        #endregion
+
+        #region 判斷資料夾是否存在FTP上
+
+        /// <summary>
+        /// 判斷資料夾是否存在FTP上
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <param name="folderName">資料夾名稱</param>
+        /// <returns></returns>
+        public bool IsFolderExists(string ftpFolderPath, string folderName)
+        {
+            string ftpPath = string.Format("{0}/{1}", ftpFolderPath, folderName);
+
+            List<string> ftpFolderList = GetFolderList(ftpFolderPath);
+
+            foreach (var item in ftpFolderList)
+                if (Path.GetFileNameWithoutExtension(item) == folderName)
+                    return true;
+
+            return false;
         }
 
         #endregion
