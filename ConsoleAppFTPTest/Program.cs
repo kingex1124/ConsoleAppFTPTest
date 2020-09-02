@@ -13,19 +13,7 @@ namespace ConsoleAppFTPTest
     {
         static void Main(string[] args)
         {
-            //using (PowerShell powershell = PowerShell.Create())
-            //{
-            //    powershell.AddScript("Test-NetConnection -ComputerName 128.110.5.135 -Port 21");
-
-            //    var powerResult = powershell.Invoke();
-
-            //    foreach (PSObject result in powerResult)
-            //    {
-            //        Console.WriteLine(result.Members["TcpTestSucceeded"].Value);
-            //    }
-            //}
-
-            //FTPHelp ftp3 = new FTPHelp("128.110.138.11", "test", "011684");
+            //FTPHelper ftp3 = new FTPHelper("128.110.138.11", "test", "011684");
 
             //var re = ftp3.UploadFile("", "123.txt", @"C:\Users\011714\Desktop\down", "TEST1.txt");
 
@@ -45,7 +33,7 @@ namespace ConsoleAppFTPTest
 
             //FTPParameter param2 = new FTPParameter("128.110.5.135", "006788", "ftp006788");
 
-            //FTPHelp ftp2 = new FTPHelp(param2);
+            //FTPHelper ftp2 = new FTPHelper(param2);
 
             //var reUpFolder = ftp.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
 

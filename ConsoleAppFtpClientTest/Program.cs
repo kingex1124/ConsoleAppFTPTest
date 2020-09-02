@@ -11,9 +11,9 @@ namespace ConsoleAppFtpClientTest
     {
         static void Main(string[] args)
         {
-            //var ftp = new FTPHelp("128.110.138.11", 990, "test", "011684");
+            //var ftp = new FTPSHelper("128.110.138.11", 990, "test", "011684");
 
-            //var ftp = new FTPHelp("128.110.5.134", "006788", "ftp006788");
+            //var ftp = new FTPSHelper("128.110.5.134", "006788", "ftp006788");
 
             //var conres = ftp.Connect();
 
@@ -49,7 +49,7 @@ namespace ConsoleAppFtpClientTest
 
             //var reList = ftp.GetFileList("");
 
-            
+
 
             //var reDow = ftp.DownloadFile("", "TEST.txt", @"C:\Users\011714\Desktop\down", "123.txt");
 
