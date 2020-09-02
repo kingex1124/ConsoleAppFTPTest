@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleAppFTPTest
 {
-    public class FTPHelp
+    public class FTPHelper
     {
         #region 屬性
 
@@ -27,7 +27,7 @@ namespace ConsoleAppFTPTest
 
         #region 建構子
 
-        public FTPHelp(FTPParameter param)
+        public FTPHelper(FTPParameter param)
         {
             _ftpServerIP = param.FTPServerIP;
 
@@ -45,7 +45,7 @@ namespace ConsoleAppFTPTest
         /// <param name="userName">帳號</param>
         /// <param name="password">密碼</param>
         /// <param name="ftpMode">設定是否走加密的FTP</param>
-        public FTPHelp(string ftpServerIP, string userName, string password, FTPMode ftpMode = FTPMode.None)
+        public FTPHelper(string ftpServerIP, string userName, string password, FTPMode ftpMode = FTPMode.None)
         {
             _ftpServerIP = ftpServerIP;
 

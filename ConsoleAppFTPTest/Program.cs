@@ -36,7 +36,7 @@ namespace ConsoleAppFTPTest
 
             FTPParameter param = new FTPParameter("128.110.5.134", "006788", "ftp006788");
 
-            FTPHelp ftp = new FTPHelp(param);
+            FTPHelper ftp = new FTPHelper(param);
 
             var reFileDataList = ftp.GetFileList("");
 
@@ -63,7 +63,7 @@ namespace ConsoleAppFTPTest
 
             var reUpFolder = ftp.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
 
-            FTPHelp ftp2 = new FTPHelp("128.110.5.135", "006788", "ftp006788");
+            FTPHelper ftp2 = new FTPHelper("128.110.5.135", "006788", "ftp006788");
 
             var reUpFolder2 = ftp2.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
 

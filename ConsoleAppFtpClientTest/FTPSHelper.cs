@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleAppFtpClientTest
 {
-    public class FTPSHelp
+    public class FTPSHelper
     {
         #region 屬性
 
@@ -28,7 +28,7 @@ namespace ConsoleAppFtpClientTest
         /// <param name="ip">IP</param>
         /// <param name="user">帳號</param>
         /// <param name="pwd">密碼</param>
-        public FTPSHelp(string ip, string user, string pwd)
+        public FTPSHelper(string ip, string user, string pwd)
         {
             if (!PingIPByPowerShell(ip))
                 throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));
@@ -45,7 +45,7 @@ namespace ConsoleAppFtpClientTest
         /// <param name="port">Port</param>
         /// <param name="user">帳號</param>
         /// <param name="pwd">密碼</param>
-        public FTPSHelp(string ip, int port, string user, string pwd)
+        public FTPSHelper(string ip, int port, string user, string pwd)
         {
             if (!PingIPByPowerShell(ip, port))
                 throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));

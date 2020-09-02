@@ -57,7 +57,7 @@ namespace ConsoleAppFtpClientTest
 
             //var reUpFolder = ftp.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
 
-            var ftp2 = new FTPSHelp("128.110.5.135", 990, "006788", "ftp006788");
+            var ftp2 = new FTPSHelper("128.110.5.135", 990, "006788", "ftp006788");
 
             var recon2 = ftp2.Connect();
             var reList = ftp2.GetFileAndFolderList("");
