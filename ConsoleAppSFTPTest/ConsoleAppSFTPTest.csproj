@@ -47,7 +47,6 @@
     <Reference Include="System.Management.Automation" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\ExecuteResult.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SFTPHelper.cs" />
@@ -55,6 +54,12 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{074d876f-b4d0-4ed9-91b0-70770a842109}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

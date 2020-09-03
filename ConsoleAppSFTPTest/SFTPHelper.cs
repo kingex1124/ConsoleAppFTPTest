@@ -1,4 +1,6 @@
-﻿using Renci.SshNet;
+﻿using Common.Interface;
+using Common.Model;
+using Renci.SshNet;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,7 +15,7 @@ namespace ConsoleAppSFTPTest
     /// <summary>
     /// SFTP操作類
     /// </summary>
-    public class SFTPHelper
+    public class SFTPHelper: ISFPTHelper
     {
         #region 欄位或屬性
         private SftpClient _sftp;
@@ -803,26 +805,6 @@ namespace ConsoleAppSFTPTest
             return result;
         }
 
-        #endregion
-
-        #region 移動SFTP檔案
-        /// <summary>
-        /// 移動SFTP檔案
-        /// </summary>
-        /// <param name="oldRemotePath">舊遠端路徑</param>
-        /// <param name="newRemotePath">新遠端路徑</param>
-        public void Move(string oldRemotePath, string newRemotePath)
-        {
-            try
-            {
-                _sftp.RenameFile(oldRemotePath, newRemotePath);
-            }
-            catch (Exception ex)
-            {
-                // TxtLog.WriteTxt(CommonMethod.GetProgramName(), string.Format("SFTP檔案移動失敗，原因：{0}", ex.Message));
-                throw new Exception(string.Format("SFTP檔案移動失敗，原因：{0}", ex.Message));
-            }
-        }
         #endregion
     }
 }

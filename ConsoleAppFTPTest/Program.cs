@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Common;
+using Common.Interface;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +15,12 @@ namespace ConsoleAppFTPTest
     {
         static void Main(string[] args)
         {
+            UnityContainer.Register<IFTPHelper, FTPHelper>();
+
+            IFTPHelper ftpHelper = UnityContainer.Resolve<IFTPHelper, FTPHelper>(new object[] { "128.110.5.134", "006788", "ftp006788", FTPMode.None });
+
+            var po = ftpHelper.GetFileAndFolderList("");
+
             //FTPHelper ftp3 = new FTPHelper("128.110.138.11", "test", "011684");
 
             //var re = ftp3.UploadFile("", "123.txt", @"C:\Users\011714\Desktop\down", "TEST1.txt");
@@ -23,7 +31,7 @@ namespace ConsoleAppFTPTest
             //var data = new FileInfo(@"C:\Users\011714\Desktop\down\TEST2.txt").Length;
 
             FTPParameter param = new FTPParameter("128.110.5.134", "006788", "ftp006788");
-
+            
             FTPHelper ftp = new FTPHelper(param);
     
             var reFileDataList = ftp.GetFileList("");

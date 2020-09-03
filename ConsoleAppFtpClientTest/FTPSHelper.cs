@@ -1,4 +1,6 @@
-﻿using FluentFTP;
+﻿using Common.Interface;
+using Common.Model;
+using FluentFTP;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleAppFtpClientTest
 {
-    public class FTPSHelper
+    public class FTPSHelper: IFTPSHelper
     {
         #region 屬性
 

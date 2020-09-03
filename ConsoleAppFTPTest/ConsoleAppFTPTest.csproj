@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FTPHelper.cs" />
-    <Compile Include="Model\ExecuteResult.cs" />
     <Compile Include="Model\FTPMode.cs" />
     <Compile Include="Model\FTPParameter.cs" />
     <Compile Include="Program.cs" />
@@ -54,6 +53,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{074D876F-B4D0-4ED9-91B0-70770A842109}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

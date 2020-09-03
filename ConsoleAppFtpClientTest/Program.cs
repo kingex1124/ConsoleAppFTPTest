@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Common;
+using Common.Interface;
+using ConsoleAppFTPTest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;

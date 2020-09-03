@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Common.Interface;
+using Common.Model;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleAppFTPTest
 {
-    public class FTPHelper
+    public class FTPHelper: IFTPHelper
     {
         #region 屬性
 
@@ -145,7 +147,7 @@ namespace ConsoleAppFTPTest
         /// <summary>
         /// 取得檔案列表
         /// </summary>
-        /// <param name="ftpFolderPath"></param>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
         public List<string> GetFileList(string ftpFolderPath)
         {
@@ -169,7 +171,7 @@ namespace ConsoleAppFTPTest
         /// <summary>
         /// 取得資料夾列表
         /// </summary>
-        /// <param name="ftpFolderPath"></param>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
         public List<string> GetFolderList(string ftpFolderPath)
         {
