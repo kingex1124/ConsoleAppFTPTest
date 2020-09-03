@@ -49,8 +49,6 @@ namespace ConsoleAppFtpClientTest
 
             //var reList = ftp.GetFileList("");
 
-
-
             //var reDow = ftp.DownloadFile("", "TEST.txt", @"C:\Users\011714\Desktop\down", "123.txt");
 
             //var reUpFile = ftp.UploadFile("TEST", "123.txt", @"C:\Users\011714\Desktop\down", "TEST1.txt");
@@ -60,6 +58,7 @@ namespace ConsoleAppFtpClientTest
             var ftp2 = new FTPSHelper("128.110.5.135", 990, "006788", "ftp006788");
 
             var recon2 = ftp2.Connect();
+
             var reList = ftp2.GetFileAndFolderList("");
 
             var reFileList = ftp2.GetFileList("");

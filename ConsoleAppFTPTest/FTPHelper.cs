@@ -227,6 +227,39 @@ namespace ConsoleAppFTPTest
             }
         }
 
+        /// <summary>
+        /// 取得資料夾最後修改日期
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <param name="folderName">資料夾名稱</param>
+        /// <returns></returns>
+        public DateTime GetFolderModifiedDate(string ftpFolderPath, string folderName)
+        {
+            try
+            {
+                if (IsFolderExists(ftpFolderPath, folderName))
+                {
+                    string uriPath = string.Format("{0}{1}/{2}/{3}", "FTP://", _ftpServerIP, ftpFolderPath, folderName);
+
+                    FtpWebRequest ftp = SettingFTP(uriPath);
+
+                    //取得資料修改日期
+                    ftp.Method = WebRequestMethods.Ftp.GetDateTimestamp;
+
+                    //取得FTP請求回應
+                    FtpWebResponse ftpWebResponse = (FtpWebResponse)ftp.GetResponse();
+
+                    return ftpWebResponse.LastModified;
+                }
+                else
+                    throw new Exception(string.Format("取得FTP資料夾修改日其失敗，原因：{0}", "FTP上無此檔案"));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("取得FTP資料夾修改日其失敗，原因：{0}", ex.Message));
+            }
+        }
+
         #endregion
 
         #region 取得檔案大小
@@ -772,6 +805,148 @@ namespace ConsoleAppFTPTest
                     return true;
 
             return false;
+        }
+
+        #endregion
+
+        #region 檔案、資料夾改名稱、搬移
+
+        /// <summary>
+        /// 修改FTP上檔案名稱
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <param name="oldFileName">原本檔案名稱(含附檔名)</param>
+        /// <param name="newFileName">新的檔案名稱(含附檔名)</param>
+        /// <returns></returns>
+        public ExecuteResult ReNameFile(string ftpFolderPath, string oldFileName, string newFileName)
+        {
+            return MoveFile(ftpFolderPath, oldFileName, ftpFolderPath, newFileName);
+        }
+
+        /// <summary>
+        /// FTP上移動檔案
+        /// </summary>
+        /// <param name="oldFtpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <param name="fileName">檔案名稱(含附檔名)</param>
+        /// <param name="newFtpFolderPath">新的資料夾路徑，根目錄請代空字串</param>
+        /// <returns></returns>
+        public ExecuteResult MoveFile(string oldFtpFolderPath, string fileName, string newFtpFolderPath)
+        {
+            return MoveFile(oldFtpFolderPath, fileName, newFtpFolderPath, fileName);
+        }
+
+        /// <summary>
+        /// FTP上移動檔案，並修改檔案名稱
+        /// </summary>
+        /// <param name="oldFtpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <param name="oldFileName">原本檔案名稱(含附檔名)</param>
+        /// <param name="newFtpFolderPath">新的檔案名稱(含附檔名)</param>
+        /// <param name="newFileName">新的資料夾路徑，根目錄請代空字串</param>
+        /// <returns></returns>
+        public ExecuteResult MoveFile(string oldFtpFolderPath,string oldFileName,string newFtpFolderPath,string newFileName)
+        {
+            ExecuteResult result = new ExecuteResult();
+            try
+            {
+                if (IsFileExists(oldFtpFolderPath, oldFileName))
+                {
+                    string uriPath = string.Format("{0}{1}/{2}/{3}", "FTP://", _ftpServerIP, oldFtpFolderPath, oldFileName);
+
+                    FtpWebRequest ftp = SettingFTP(uriPath);
+
+                    ftp.Method = WebRequestMethods.Ftp.Rename;
+
+                    ftp.RenameTo = string.Format("{0}/{1}", newFtpFolderPath, newFileName);
+
+                    StreamReader sr = new StreamReader(ftp.GetResponse().GetResponseStream(), Encoding.UTF8);
+
+                    sr.Close();
+                    sr.Dispose();
+
+                    result.IsSuccessed = true;
+                    result.Message = "異動成功。";
+                }
+                else
+                {
+                    result.IsSuccessed = false;
+                    result.Message = string.Format("異動FTP檔案失敗，原因：{0}", "FTP上無此檔案");
+                }
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccessed = false;
+                result.Message = string.Format("異動FTP檔案失敗，原因：{0}", ex.Message);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 修改FTP上資料夾名稱
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <param name="oldFolderName">原本資料夾名稱</param>
+        /// <param name="newFolderName">新的資料夾名稱</param>
+        /// <returns></returns>
+        public ExecuteResult ReNameFolder(string ftpFolderPath, string oldFolderName, string newFolderName)
+        {
+            return MoveFolder(ftpFolderPath, oldFolderName, ftpFolderPath, newFolderName);
+        }
+
+        /// <summary>
+        /// FTP上移動資料夾
+        /// </summary>
+        /// <param name="oldFtpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <param name="folderName">資料夾名稱</param>
+        /// <param name="newFtpFolderPath">新的資料夾路徑，根目錄請代空字串</param>
+        /// <returns></returns>
+        public ExecuteResult MoveFolder(string oldFtpFolderPath, string folderName, string newFtpFolderPath)
+        {
+            return MoveFolder(oldFtpFolderPath, folderName, newFtpFolderPath, folderName);
+        }
+
+        /// <summary>
+        /// FTP上移動資料夾，並修改資料夾名稱
+        /// </summary>
+        /// <param name="oldFtpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <param name="oldFolderName">原本資料夾名稱</param>
+        /// <param name="newFtpFolderPath">新的資料夾名稱</param>
+        /// <param name="newFolderName">新的資料夾路徑，根目錄請代空字串</param>
+        /// <returns></returns>
+        public ExecuteResult MoveFolder(string oldFtpFolderPath, string oldFolderName, string newFtpFolderPath, string newFolderName)
+        {
+            ExecuteResult result = new ExecuteResult();
+            try
+            {
+                if (IsFolderExists(oldFtpFolderPath, oldFolderName))
+                {
+                    string uriPath = string.Format("{0}{1}/{2}/{3}", "FTP://", _ftpServerIP, oldFtpFolderPath, oldFolderName);
+
+                    FtpWebRequest ftp = SettingFTP(uriPath);
+
+                    ftp.Method = WebRequestMethods.Ftp.Rename;
+
+                    ftp.RenameTo = string.Format("{0}/{1}", newFtpFolderPath, newFolderName);
+
+                    StreamReader sr = new StreamReader(ftp.GetResponse().GetResponseStream(), Encoding.UTF8);
+
+                    sr.Close();
+                    sr.Dispose();
+
+                    result.IsSuccessed = true;
+                    result.Message = "異動成功。";
+                }
+                else
+                {
+                    result.IsSuccessed = false;
+                    result.Message = string.Format("異動FTP資料夾失敗，原因：{0}", "FTP上無此檔案");
+                }
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccessed = false;
+                result.Message = string.Format("異動FTP資料夾失敗，原因：{0}", ex.Message);
+            }
+            return result;
         }
 
         #endregion

@@ -25,11 +25,11 @@ namespace ConsoleAppFTPTest
             FTPParameter param = new FTPParameter("128.110.5.134", "006788", "ftp006788");
 
             FTPHelper ftp = new FTPHelper(param);
-
+    
             var reFileDataList = ftp.GetFileList("");
 
             var reFolderList = ftp.GetFolderList("");
-            // ftp.RemoveFolder("", "測試");
+             //ftp.RemoveFolder("", "測試");
 
             //FTPParameter param2 = new FTPParameter("128.110.5.135", "006788", "ftp006788");
 

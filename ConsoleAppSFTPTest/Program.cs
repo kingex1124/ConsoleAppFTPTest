@@ -39,7 +39,7 @@ namespace ConsoleAppSFTPTest
             SFTPHelper sftpHelp2 = new SFTPHelper("128.110.5.135", 22, "APUSER", "2wsx#EDC");
 
             var reConn2 = sftpHelp2.Connect();
-
+          
             //var reUpFolder = sftpHelp2.UploadFolder("測試", @"C:\Users\011714\Desktop\down");
             var reUpFolder = sftpHelp2.UploadFolder("測試", @"C:\Users\cam\Desktop\TestData");
         }
