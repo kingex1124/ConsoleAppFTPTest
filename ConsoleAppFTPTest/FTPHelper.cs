@@ -7,6 +7,7 @@ using System.Linq;
 using System.Management.Automation;
 using System.Net;
 using System.Net.Security;
+using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,8 +40,9 @@ namespace ConsoleAppFTPTest
 
             _ftpMode = param.FTPMode;
 
-            if (!PingIPByPowerShell(_ftpServerIP))
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));
+            if (!PingIPByTcpClient(_ftpServerIP))
+                if (!PingIPByPowerShell(_ftpServerIP))
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));
         }
 
         /// <summary>
@@ -60,8 +62,9 @@ namespace ConsoleAppFTPTest
 
             _ftpMode = ftpMode;
 
-            if (!PingIPByPowerShell(ftpServerIP))
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));
+            if (!PingIPByTcpClient(ftpServerIP))
+                if (!PingIPByPowerShell(ftpServerIP))
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));
         }
 
         #endregion
@@ -69,7 +72,23 @@ namespace ConsoleAppFTPTest
         #region 判斷FTP站台是否存在
 
         /// <summary>
-        /// 判斷FTP站台是否存在
+        /// 透過TcpClient判斷FTP站台是否存在
+        /// </summary>
+        /// <param name="ftpServerIP"></param>
+        /// <returns></returns>
+        private bool PingIPByTcpClient(string ftpServerIP)
+        {
+            using (TcpClient tcpClient = new TcpClient(ftpServerIP, 21))
+            {
+                if (tcpClient.Connected)
+                    return true;
+                else
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// 透過PowerShare判斷FTP站台是否存在
         /// </summary>
         /// <param name="ftpServerIP"></param>
         /// <returns></returns>

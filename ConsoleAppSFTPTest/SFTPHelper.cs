@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,8 +37,9 @@ namespace ConsoleAppSFTPTest
         /// <param name="pwd">密碼</param>
         public SFTPHelper(string ip, int port, string user, string pwd)
         {
-            if (!PingIPByPowerShell(ip, port))
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));
+            if (!PingIPByTcpClient(ip, port))
+                if (!PingIPByPowerShell(ip, port))
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));
 
             _sftp = new SftpClient(ip, port, user, pwd);
         }
@@ -50,8 +52,9 @@ namespace ConsoleAppSFTPTest
         /// <param name="pwd">密碼</param>
         public SFTPHelper(string ip, string user, string pwd)
         {
-            if (!PingIPByPowerShell(ip))
-                throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));
+            if (!PingIPByTcpClient(ip))
+                if (!PingIPByPowerShell(ip))
+                    throw new Exception(string.Format("連線FTP失敗，原因：{0}", "此IP不通"));
 
             _sftp = new SftpClient(ip, user, pwd);
         }
@@ -59,6 +62,22 @@ namespace ConsoleAppSFTPTest
         #endregion
 
         #region 判斷FTP站台是否存在
+
+        /// <summary>
+        /// 透過TcpClient判斷FTP站台是否存在
+        /// </summary>
+        /// <param name="ftpServerIP"></param>
+        /// <returns></returns>
+        private bool PingIPByTcpClient(string ftpServerIP, int port = -1)
+        {
+            using (TcpClient tcpClient = new TcpClient(ftpServerIP, port == -1 ? 21 : port))
+            {
+                if (tcpClient.Connected)
+                    return true;
+                else
+                    return false;
+            }
+        }
 
         /// <summary>
         /// 判斷FTP站台是否存在
