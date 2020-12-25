@@ -14,6 +14,11 @@ using System.Threading.Tasks;
 
 namespace ConsoleAppFTPTest
 {
+    /// <summary>
+    /// 請勿使用此類別
+    /// 微軟已經沒有在維護了
+    /// 需使用FTP，請用FTPSHelper
+    /// </summary>
     public class FTPHelper: IFTPHelper
     {
         #region 屬性
@@ -128,6 +133,7 @@ namespace ConsoleAppFTPTest
         #region 取得表單
 
         /// <summary>
+        /// 重要!!此方法取不到資料夾 也取不到完整路徑
         /// 取得檔案列表(Service完整路徑，但沒有FTP://跟IP那些)
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
@@ -143,7 +149,7 @@ namespace ConsoleAppFTPTest
                 //建立FTP連線
                 FtpWebRequest ftp = SettingFTP(uriPath);
 
-                //取得檔案清單
+                //取得檔案清單 此方法取不到資料夾 也取不到完整路徑
                 ftp.Method = WebRequestMethods.Ftp.ListDirectory;
 
                 //取得FTP請求回應
@@ -172,18 +178,30 @@ namespace ConsoleAppFTPTest
         {
             try
             {
-                var fileAndFolder = GetFileAndFolderList(ftpFolderPath);
-
                 List<string> result = new List<string>();
-                foreach (var item in fileAndFolder)
-                    if (Path.HasExtension(item))
-                        result.Add(item);
+
+                string uriPath = string.Format("{0}{1}/{2}", "FTP://", _ftpServerIP, ftpFolderPath);
+
+                //建立FTP連線
+                FtpWebRequest ftp = SettingFTP(uriPath);
+
+                //取得檔案清單 此方法取不到資料夾 也取不到完整路徑
+                ftp.Method = WebRequestMethods.Ftp.ListDirectory;
+
+                //取得FTP請求回應
+                StreamReader streamReader = new StreamReader(ftp.GetResponse().GetResponseStream(), Encoding.UTF8);
+
+                while (!(streamReader.EndOfStream))
+                    result.Add(streamReader.ReadLine());
+
+                streamReader.Close();
+                streamReader.Dispose();
 
                 return result;
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("取得FTP檔案列表失敗，原因：{0}", ex.ToString()));
+                throw new Exception(string.Format("取得FTP表單失敗，原因：{0}", ex.ToString()));
             }
         }
 
