@@ -17,9 +17,9 @@ namespace ConsoleAppFTPTest
         {
             UnityContainer.Register<IFTPHelper, FTPHelper>();
 
-            IFTPHelper ftpHelper = UnityContainer.Resolve<IFTPHelper, FTPHelper>(new object[] { "128.110.5.134", "006788", "ftp006788", FTPMode.None });
+            //IFTPHelper ftpHelper = UnityContainer.Resolve<IFTPHelper, FTPHelper>(new object[] { "128.110.5.134", "006788", "ftp006788", FTPMode.None });
 
-            var po = ftpHelper.GetFileAndFolderList("");
+            //var po = ftpHelper.GetFileAndFolderFullNameList("");
 
             //FTPHelper ftp3 = new FTPHelper("128.110.138.11", "test", "011684");
 

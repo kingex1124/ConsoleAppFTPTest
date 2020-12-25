@@ -19,7 +19,7 @@ namespace ConsoleAppFTPTest
     /// 微軟已經沒有在維護了
     /// 需使用FTP，請用FTPSHelper
     /// </summary>
-    public class FTPHelper: IFTPHelper
+    public class FTPHelper
     {
         #region 屬性
 

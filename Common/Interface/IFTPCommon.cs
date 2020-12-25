@@ -14,6 +14,13 @@ namespace Common.Interface
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
+        List<string> GetFileAndFolderFullNameList(string ftpFolderPath);
+
+        /// <summary>
+        /// 取得檔案列表(非完整路徑)
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <returns></returns>
         List<string> GetFileAndFolderList(string ftpFolderPath);
 
         /// <summary>
@@ -21,10 +28,24 @@ namespace Common.Interface
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
+        List<string> GetFileFullNameList(string ftpFolderPath);
+
+        /// <summary>
+        /// 取得檔案列表(非完整路徑)
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <returns></returns>
         List<string> GetFileList(string ftpFolderPath);
 
         /// <summary>
         /// 取得資料夾列表
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <returns></returns>
+        List<string> GetFolderFullNameList(string ftpFolderPath);
+
+        /// <summary>
+        /// 取得資料夾列表(非完整路徑)
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>

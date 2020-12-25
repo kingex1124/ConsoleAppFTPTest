@@ -10,6 +10,12 @@ namespace ConsoleAppSFTPTest
     {
         static void Main(string[] args)
         {
+            var sftpHelpter = new SFTPHelper("172.17.10.113", "APEC", "3DJ5s25h");
+
+            sftpHelpter.Connect();
+
+            var sftpres = sftpHelpter.GetFileAndFolderList("upload","t");
+
             //SFTPHelper sftpHelp = new SFTPHelper("128.110.138.11", 22, "SSH011684", "011684");
 
             //var reConn = sftpHelp.Connect();

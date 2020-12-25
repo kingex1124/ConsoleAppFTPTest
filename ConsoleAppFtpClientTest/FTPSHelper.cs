@@ -164,7 +164,7 @@ namespace ConsoleAppFtpClientTest
 
         #endregion
 
-        #region 段開  FTP or FTPS
+        #region 斷開  FTP or FTPS
 
         /// <summary>
         /// 段開連線
@@ -191,7 +191,7 @@ namespace ConsoleAppFtpClientTest
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
-        public List<string> GetFileAndFolderList(string ftpFolderPath)
+        public List<string> GetFileAndFolderFullNameList(string ftpFolderPath)
         {
             try
             {
@@ -211,9 +211,57 @@ namespace ConsoleAppFtpClientTest
         }
 
         /// <summary>
+        /// 取得檔案列表(非完整路徑)
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <returns></returns>
+        public List<string> GetFileAndFolderList(string ftpFolderPath)
+        {
+            try
+            {
+                var dataArr = _ftp.GetListing(ftpFolderPath);
+
+                List<string> result = new List<string>();
+
+                foreach (var item in dataArr)
+                    result.Add(Path.GetFileName(item.FullName));
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("取得FTP表單失敗，原因：{0}", ex.ToString()));
+            }
+        }
+
+        /// <summary>
         /// 取得檔案列表
         /// </summary>
-        /// <param name="ftpFolderPath"></param>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <returns></returns>
+        public List<string> GetFileFullNameList(string ftpFolderPath)
+        {
+            try
+            {
+                var fileAndFolder = GetFileAndFolderFullNameList(ftpFolderPath);
+
+                List<string> result = new List<string>();
+                foreach (var item in fileAndFolder)
+                    if (Path.HasExtension(item))
+                        result.Add(item);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("取得FTP檔案列表失敗，原因：{0}", ex.ToString()));
+            }
+        }
+
+        /// <summary>
+        /// 取得檔案列表(非完整路徑)
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
         public List<string> GetFileList(string ftpFolderPath)
         {
@@ -238,6 +286,30 @@ namespace ConsoleAppFtpClientTest
         /// 取得資料夾列表
         /// </summary>
         /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        public List<string> GetFolderFullNameList(string ftpFolderPath)
+        {
+            try
+            {
+                var fileAndFolder = GetFileAndFolderFullNameList(ftpFolderPath);
+
+                List<string> result = new List<string>();
+                foreach (var item in fileAndFolder)
+                    if (!Path.HasExtension(item))
+                        result.Add(item);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("取得FTP資料夾列表失敗，原因：{0}", ex.ToString()));
+            }
+        }
+
+        /// <summary>
+        /// 取得資料夾列表(非完整路徑)
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
         public List<string> GetFolderList(string ftpFolderPath)
         {
@@ -470,7 +542,7 @@ namespace ConsoleAppFtpClientTest
         {
             try
             {
-                var dataList = GetFileList(ftpFolderPath);
+                var dataList = GetFileFullNameList(ftpFolderPath);
 
                 foreach (var item in dataList)
                 {

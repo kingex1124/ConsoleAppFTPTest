@@ -16,7 +16,7 @@ namespace ConsoleAppSFTPTest
     /// <summary>
     /// SFTP操作類
     /// </summary>
-    public class SFTPHelper: ISFPTHelper
+    public class SFTPHelper : ISFPTHelper
     {
         #region 欄位或屬性
         private SftpClient _sftp;
@@ -169,13 +169,13 @@ namespace ConsoleAppSFTPTest
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
-        public List<string> GetFileAndFolderList(string ftpFolderPath)
+        public List<string> GetFileAndFolderFullNameList(string ftpFolderPath)
         {
             try
             {
                 List<string> result = new List<string>();
 
-                var data =_sftp.ListDirectory(ftpFolderPath);
+                var data = _sftp.ListDirectory(ftpFolderPath);
 
                 foreach (var item in data)
                     result.Add(item.FullName);
@@ -189,7 +189,34 @@ namespace ConsoleAppSFTPTest
         }
 
         /// <summary>
+        /// 取得檔案列表(非完整路徑)
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
+        /// <returns></returns>
+        public List<string> GetFileAndFolderList(string ftpFolderPath)
+        {
+            try
+            {
+                List<string> result = new List<string>();
+
+                var data = _sftp.ListDirectory(ftpFolderPath);
+
+                foreach (var item in data)
+                    result.Add(item.Name);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("取得SFTP表單失敗，原因：{0}", ex.ToString()));
+            }
+        }
+
+
+
+        /// <summary>
         /// 獲取SFTP檔案列表
+        /// 透過字尾抓取檔案List
         /// </summary>
         /// <param name="remotePath">遠端目錄</param>
         /// <param name="fileSuffix">檔案字尾</param>
@@ -201,7 +228,7 @@ namespace ConsoleAppSFTPTest
                 var files = _sftp.ListDirectory(remotePath);
                 var objList = new List<string>();
                 foreach (var file in files)
-                {
+                { 
                     string name = file.Name;
                     if (name.Length > (fileSuffix.Length + 1) && fileSuffix == name.Substring(name.Length - fileSuffix.Length))
                         objList.Add(name);
@@ -219,6 +246,30 @@ namespace ConsoleAppSFTPTest
         /// 取得檔案列表
         /// </summary>
         /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        public List<string> GetFileFullNameList(string ftpFolderPath)
+        {
+            try
+            {
+                var fileAndFolder = GetFileAndFolderFullNameList(ftpFolderPath);
+
+                List<string> result = new List<string>();
+                foreach (var item in fileAndFolder)
+                    if (Path.HasExtension(item))
+                        result.Add(item);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("取得SFTP檔案列表失敗，原因：{0}", ex.ToString()));
+            }
+        }
+
+        /// <summary>
+        /// 取得檔案列表(非完整路徑)
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
         public List<string> GetFileList(string ftpFolderPath)
         {
@@ -243,6 +294,30 @@ namespace ConsoleAppSFTPTest
         /// 取得資料夾列表
         /// </summary>
         /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        public List<string> GetFolderFullNameList(string ftpFolderPath)
+        {
+            try
+            {
+                var fileAndFolder = GetFileAndFolderFullNameList(ftpFolderPath);
+
+                List<string> result = new List<string>();
+                foreach (var item in fileAndFolder)
+                    if (!Path.HasExtension(item))
+                        result.Add(item);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("取得SFTP資料夾列表失敗，原因：{0}", ex.ToString()));
+            }
+        }
+
+        /// <summary>
+        /// 取得資料夾列表(非完整路徑)
+        /// </summary>
+        /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>
         /// <returns></returns>
         public List<string> GetFolderList(string ftpFolderPath)
         {
@@ -459,7 +534,7 @@ namespace ConsoleAppSFTPTest
         {
             try
             {
-                var dataList = GetFileList(ftpFolderPath);
+                var dataList = GetFileFullNameList(ftpFolderPath);
 
                 foreach (var item in dataList)
                 {
@@ -640,7 +715,7 @@ namespace ConsoleAppSFTPTest
         {
             string ftpPath = string.Format("{0}/{1}", ftpFolderPath, folderName);
 
-            List<string> ftpFolderList = GetFolderList(ftpFolderPath);
+            List<string> ftpFolderList = GetFolderFullNameList(ftpFolderPath);
 
             foreach (var item in ftpFolderList)
                 if (Path.GetFileNameWithoutExtension(item) == folderName)

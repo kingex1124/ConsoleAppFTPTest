@@ -62,11 +62,11 @@ namespace ConsoleAppFtpClientTest
 
             var recon2 = ftp2.Connect();
 
-            var reList = ftp2.GetFileAndFolderList("");
+            var reList = ftp2.GetFileAndFolderFullNameList("");
 
-            var reFileList = ftp2.GetFileList("");
+            var reFileList = ftp2.GetFileFullNameList("");
 
-            var reFolderList = ftp2.GetFolderList("");
+            var reFolderList = ftp2.GetFolderFullNameList("");
 
             //var reUpFolder3 = ftp2.UploadFile("測試", "TEST1.txt", @"C:\Users\011714\Desktop\down", "TEST1.txt");
 
