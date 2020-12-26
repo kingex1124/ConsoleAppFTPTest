@@ -16,7 +16,7 @@ namespace ConsoleAppSFTPTest
     /// <summary>
     /// SFTP操作類
     /// </summary>
-    public class SFTPHelper : ISFPTHelper
+    public class SFTPHelper : ISFTPHelper
     {
         #region 欄位或屬性
         private SftpClient _sftp;

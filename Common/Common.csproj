@@ -44,7 +44,7 @@
     <Compile Include="Interface\IFTPCommon.cs" />
     <Compile Include="Interface\IFTPHelper.cs" />
     <Compile Include="Interface\IFTPSHelper.cs" />
-    <Compile Include="Interface\ISFPTHelper.cs" />
+    <Compile Include="Interface\ISFTPHelper.cs" />
     <Compile Include="Model\FTPExecuteResult.cs" />
     <Compile Include="Model\FTPFileInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

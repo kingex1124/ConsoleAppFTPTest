@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Common;
+using Common.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +12,7 @@ namespace ConsoleAppSFTPTest
     {
         static void Main(string[] args)
         {
-            var sftpHelpter = new SFTPHelper("172.17.10.113", "APEC", "3DJ5s25h");
+            ISFTPHelper sftpHelpter = UnityContainer.Resolve<ISFTPHelper, SFTPHelper>(new object[] { "172.17.10.113", "APEC", "3DJ5s25h" });
 
             sftpHelpter.Connect();
 
