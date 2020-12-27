@@ -187,6 +187,62 @@ namespace ConsoleAppFtpClientTest
         #region 取得表單
 
         /// <summary>
+        /// 取得檔案資料夾完整資訊
+        /// </summary>
+        /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        public List<FTPFileInfo> GetFileAndFolderListInfo(string ftpFolderPath)
+        {
+            try
+            {
+                var dataArr = _ftp.GetListing(ftpFolderPath);
+
+                List<FTPFileInfo> result = new List<FTPFileInfo>();
+
+                foreach (var item in dataArr)
+                {
+                    result.Add(new FTPFileInfo()
+                    {
+                        FullFileName = item.FullName,
+                        FileName = Path.GetFileName(item.FullName),
+                        ModifiedDate = _ftp.GetModifiedTime(Path.Combine(ftpFolderPath, Path.GetFileName(item.FullName))),
+                        FileSize = _ftp.GetFileSize(item.FullName)
+                    });
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("取得FTP表單失敗，原因：{0}", ex.ToString()));
+            }
+        }
+
+        /// <summary>
+        /// 取得檔案完整資訊
+        /// </summary>
+        /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        public List<FTPFileInfo> GetFileListInfo(string ftpFolderPath)
+        {
+            try
+            {
+                var fullList = GetFileAndFolderListInfo(ftpFolderPath);
+
+                List<FTPFileInfo> result = new List<FTPFileInfo>();
+                foreach (var item in fullList)
+                    if (Path.HasExtension(item.FullFileName))
+                        result.Add(item);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("取得FTP表單失敗，原因：{0}", ex.ToString()));
+            }
+        }
+
+        /// <summary>
         /// 取得檔案列表(Service完整路徑)
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>

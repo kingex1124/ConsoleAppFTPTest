@@ -10,6 +10,20 @@ namespace Common.Interface
     public interface IFTPCommon
     {
         /// <summary>
+        /// 取得檔案資料夾完整資訊
+        /// </summary>
+        /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        List<FTPFileInfo> GetFileAndFolderListInfo(string ftpFolderPath);
+
+        /// <summary>
+        /// 取得檔案完整資訊
+        /// </summary>
+        /// <param name="ftpFolderPath"></param>
+        /// <returns></returns>
+        List<FTPFileInfo> GetFileListInfo(string ftpFolderPath);
+
+        /// <summary>
         /// 取得檔案列表(Service完整路徑，但沒有FTP://跟IP那些)
         /// </summary>
         /// <param name="ftpFolderPath">資料夾路徑，根目錄請代空字串</param>

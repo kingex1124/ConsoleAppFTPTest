@@ -12,6 +12,7 @@ namespace Common.Model
         {
         }
 
+        public string FullFileName { get; set; }
         public string FileName { get; set; }
 
         public long FileSize { get; set; }
