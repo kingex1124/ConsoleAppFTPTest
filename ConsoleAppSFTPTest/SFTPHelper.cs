@@ -183,8 +183,8 @@ namespace ConsoleAppSFTPTest
                     {
                         FullFileName = item.FullName,
                         FileName = Path.GetFileName(item.FullName),
-                        ModifiedDate = _sftp.GetLastAccessTime(Path.Combine(ftpFolderPath, Path.GetFileName(item.FullName))),
-                        FileSize = _sftp.Get(Path.Combine(ftpFolderPath, Path.GetFileName(item.FullName))).Attributes.Size
+                        ModifiedDate = item.LastAccessTime,
+                        FileSize = item.Length
                     });
                 }
 
@@ -409,7 +409,7 @@ namespace ConsoleAppSFTPTest
             try
             {
                 if (IsFileExists(ftpFolderPath, fileName))
-                    return _sftp.GetLastAccessTime(Path.Combine(ftpFolderPath, fileName));
+                    return _sftp.GetLastAccessTime(string.Format("/{0}/{1}", ftpFolderPath, fileName));
                 else
                     throw new Exception(string.Format("取得SFTP檔案修改日其失敗，原因：{0}", "SFTP上無此檔案"));
             }
@@ -430,7 +430,7 @@ namespace ConsoleAppSFTPTest
             try
             {
                 if (IsFolderExists(ftpFolderPath, folderName))
-                    return _sftp.GetLastAccessTime(Path.Combine(ftpFolderPath, folderName));
+                    return _sftp.GetLastAccessTime(string.Format("/{0}/{1}", ftpFolderPath, folderName));
                 else
                     throw new Exception(string.Format("取得SFTP資料夾修改日其失敗，原因：{0}", "SFTP上無此檔案"));
             }
@@ -455,7 +455,7 @@ namespace ConsoleAppSFTPTest
             try
             {
                 if (IsFileExists(ftpFolderPath, fileName))
-                    return _sftp.Get(Path.Combine(ftpFolderPath, fileName)).Attributes.Size;
+                    return _sftp.Get(string.Format("/{0}/{1}", ftpFolderPath, fileName)).Attributes.Size;
                 else
                     throw new Exception(string.Format("取得SFTP檔案大小失敗，原因：{0}", "SFTP上無此檔案"));
             }
@@ -671,7 +671,7 @@ namespace ConsoleAppSFTPTest
             {
                 if (!IsFolderExists(ftpFolderPath, folderName))
                 {
-                    _sftp.CreateDirectory(Path.Combine(ftpFolderPath, folderName));
+                    _sftp.CreateDirectory(string.Format("/{0}/{1}", ftpFolderPath, folderName));
 
                     return FTPExecuteResult.Ok("資料夾建立成功。");
                 }
@@ -700,7 +700,7 @@ namespace ConsoleAppSFTPTest
             {
                 if (IsFileExists(ftpFolderPath, fileName))
                 {
-                    _sftp.Delete(Path.Combine(ftpFolderPath, fileName));
+                    _sftp.Delete(string.Format("/{0}/{1}",ftpFolderPath, fileName));
 
                     return FTPExecuteResult.Ok("刪除檔案成功。");
                 }
@@ -729,7 +729,7 @@ namespace ConsoleAppSFTPTest
             {
                 if (IsFolderExists(ftpFolderPath, folderName))
                 {
-                    _sftp.DeleteDirectory(Path.Combine(ftpFolderPath, folderName));
+                    _sftp.DeleteDirectory(string.Format("/{0}/{1}", ftpFolderPath, folderName));
 
                     return FTPExecuteResult.Ok("成功刪除資料夾");
                 }
@@ -754,7 +754,7 @@ namespace ConsoleAppSFTPTest
         /// <returns></returns>
         public bool IsFileExists(string ftpFolderPath, string fileName)
         {
-            return _sftp.Exists(Path.Combine(ftpFolderPath, fileName));//_sftp.Exists(string.Format("{0}/{1}", ftpFolderPath, fileName));
+            return _sftp.Exists(string.Format("/{0}/{1}", ftpFolderPath, fileName));//_sftp.Exists(Path.Combine(ftpFolderPath, fileName));//
         }
 
         #endregion
@@ -769,7 +769,7 @@ namespace ConsoleAppSFTPTest
         /// <returns></returns>
         public bool IsFolderExists(string ftpFolderPath, string folderName)
         {
-            string ftpPath = string.Format("{0}/{1}", ftpFolderPath, folderName);
+            string ftpPath = string.Format("/{0}/{1}", ftpFolderPath, folderName);
 
             List<string> ftpFolderList = GetFolderFullNameList(ftpFolderPath);
 
@@ -822,7 +822,7 @@ namespace ConsoleAppSFTPTest
             {
                 if (IsFileExists(oldFtpFolderPath, oldFileName))
                 {
-                    _sftp.RenameFile(Path.Combine(oldFtpFolderPath, oldFileName), Path.Combine(newFtpFolderPath, newFileName));
+                    _sftp.RenameFile(string.Format("/{0}/{1}", oldFtpFolderPath, oldFileName), string.Format("/{0}/{1}", newFtpFolderPath, newFileName));
 
                     return FTPExecuteResult.Ok("異動成功。");
                 }

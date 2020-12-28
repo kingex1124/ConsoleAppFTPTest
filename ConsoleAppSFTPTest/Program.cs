@@ -12,11 +12,19 @@ namespace ConsoleAppSFTPTest
     {
         static void Main(string[] args)
         {
+            UnityContainer.Register<ISFTPHelper, SFTPHelper>();
+
             ISFTPHelper sftpHelpter = UnityContainer.Resolve<ISFTPHelper, SFTPHelper>(new object[] { "172.17.10.113", "APEC", "3DJ5s25h" });
 
             sftpHelpter.Connect();
 
             var sftpres = sftpHelpter.GetFileAndFolderList("upload","t");
+
+            var sftpres2 = sftpHelpter.GetFileListInfo("upload");
+
+            var sftpSize = sftpHelpter.GetFolderModifiedDate("", "upload");
+
+            //var sftpCreateFolder = sftpHelpter.CreateFolder("", "123");
 
             //SFTPHelper sftpHelp = new SFTPHelper("128.110.138.11", 22, "SSH011684", "011684");
 

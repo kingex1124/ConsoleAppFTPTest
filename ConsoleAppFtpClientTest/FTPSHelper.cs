@@ -205,7 +205,7 @@ namespace ConsoleAppFtpClientTest
                     {
                         FullFileName = item.FullName,
                         FileName = Path.GetFileName(item.FullName),
-                        ModifiedDate = _ftp.GetModifiedTime(Path.Combine(ftpFolderPath, Path.GetFileName(item.FullName))),
+                        ModifiedDate = _ftp.GetModifiedTime(Path.Combine(ftpFolderPath, Path.GetFileName(item.FullName))).ToLocalTime(),
                         FileSize = _ftp.GetFileSize(item.FullName)
                     });
                 }
@@ -401,7 +401,7 @@ namespace ConsoleAppFtpClientTest
             try
             {
                 if (IsFileExists(ftpFolderPath, fileName))
-                    return _ftp.GetModifiedTime(Path.Combine(ftpFolderPath, fileName));
+                    return _ftp.GetModifiedTime(Path.Combine(ftpFolderPath, fileName)).ToLocalTime();
                 else
                     throw new Exception(string.Format("取得FTP檔案修改日其失敗，原因：{0}", "FTP上無此檔案"));
             }
@@ -422,7 +422,7 @@ namespace ConsoleAppFtpClientTest
             try
             {
                 if (IsFolderExists(ftpFolderPath, folderName))
-                    return _ftp.GetModifiedTime(Path.Combine(ftpFolderPath, folderName));
+                    return _ftp.GetModifiedTime(Path.Combine(ftpFolderPath, folderName)).ToLocalTime();
                 else
                     throw new Exception(string.Format("取得FTP資料夾修改日其失敗，原因：{0}", "FTP上無此檔案"));
             }
