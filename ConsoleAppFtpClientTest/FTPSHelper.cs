@@ -562,15 +562,21 @@ namespace ConsoleAppFtpClientTest
                     string ftpPath = Path.Combine(ftpFolderPath, fileName);
                     string localPath = Path.Combine(localFilePath, localFileName);
 
+
                     using (Stream ftpStream = _ftp.OpenRead(ftpPath))
                     {
-                        using (FileStream fileStream = File.Create(localPath, (int)ftpStream.Length))
+                        if (ftpStream.Length != 0)
                         {
-                            var buffer = new byte[200 * 1024];
-                            int count;
-                            while ((count = ftpStream.Read(buffer, 0, buffer.Length)) > 0)
-                                fileStream.Write(buffer, 0, count);
+                            using (FileStream fileStream = File.Create(localPath, (int)ftpStream.Length))
+                            {
+                                var buffer = new byte[200 * 1024];
+                                int count;
+                                while ((count = ftpStream.Read(buffer, 0, buffer.Length)) > 0)
+                                    fileStream.Write(buffer, 0, count);
+                            }
                         }
+                        else
+                            using (FileStream fs = File.Create(localPath)) { };
                     }
 
                     return FTPExecuteResult.Ok("檔案下載成功。");
